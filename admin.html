@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10110f"><title>Admin | RUDR PROPERTIES</title><link rel="stylesheet" href="styles.css"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script>
+<style>
+.admin-wrap{max-width:1050px;margin:45px auto;padding:0 20px}.admin-head{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:25px}.admin-head h1{font:36px "Playfair Display",serif;margin:0}.panel{background:white;border:1px solid #e8e2d6;padding:24px;margin-bottom:24px}.panel h2{font:25px "Playfair Display",serif;margin:0 0 18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.form-field{display:flex;flex-direction:column;gap:6px;font-size:12px;color:#5e5d56}.form-field.full{grid-column:1/-1}.form-field input,.form-field select,.form-field textarea{padding:12px;border:1px solid #ddd8cd;background:#fff;font:14px "DM Sans",sans-serif;min-width:0}.form-field textarea{min-height:100px;resize:vertical}.admin-button{padding:12px 17px;border:0;background:#171914;color:#fff;font-weight:700;cursor:pointer}.admin-button.gold{background:#d2b16b;color:#171711}.admin-button.danger{background:#8d3229}.admin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.admin-status{font-size:13px;margin:12px 0;color:#6c5424}.admin-list{display:grid;gap:10px}.admin-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e8e2d6;padding:14px;flex-wrap:wrap}.admin-row strong{display:block}.admin-row small{color:#777}.hidden{display:none!important}.hint{font-size:12px;color:#777;margin:10px 0}.login-box{max-width:460px;margin:55px auto;padding:25px;background:white;border:1px solid #e8e2d6}.login-box h1{font:30px "Playfair Display",serif}.login-box .form-field{margin-bottom:14px}@media(max-width:600px){.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}.panel{padding:17px}.admin-wrap{padding:0 14px}}
+</style></head><body>
+<header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">R</span><span><strong>RUDR <i>PROPERTIES</i></strong><small>ADMIN CONSOLE</small></span></a><nav style="display:flex"><a href="index.html">View website ↗</a></nav></header>
+<main class="admin-wrap">
+<div class="admin-head"><div><p class="eyebrow">PRIVATE MANAGEMENT</p><h1>Property admin</h1></div><button id="signOut" class="admin-button hidden">Sign out</button></div>
+<div id="configWarning" class="panel hidden"><h2>Connect Supabase first</h2><p>Open <code>config.js</code> and add your Project URL and Publishable Key. Do not use a secret/service_role key.</p></div>
+<section id="loginPanel" class="login-box"><h1>Admin sign in</h1><p class="hint">Sign in with the admin account created in Supabase Authentication.</p><label class="form-field">Email<input id="loginEmail" type="email" autocomplete="username" value="rshahni326@gmail.com"></label><label class="form-field">Password<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your Supabase Auth password"></label><div class="admin-actions"><button id="signIn" class="admin-button gold">Sign in</button></div><p id="loginStatus" class="admin-status" role="status"></p></section>
+<section id="dashboard" class="hidden">
+<div class="panel"><h2 id="formTitle">Add a property</h2><form id="propertyForm"><input type="hidden" id="propertyId"><div class="form-grid">
+<label class="form-field">Property title *<input id="title" required maxlength="150" placeholder="e.g. Premium Independent House"></label>
+<label class="form-field">Location *<input id="location" required maxlength="200" placeholder="Gomti Nagar, Lucknow"></label>
+<label class="form-field">Price *<input id="price" required maxlength="100" placeholder="₹1.5 Crore / Price on request"></label>
+<label class="form-field">Property type *<select id="propertyType" required><option value="Residential">Residential</option><option value="Plot">Plot & Land</option><option value="Commercial">Commercial</option></select></label>
+<label class="form-field">Area / size<input id="area" maxlength="120" placeholder="e.g. 2000 sq ft"></label>
+<label class="form-field">Status<select id="status"><option value="available">Available</option><option value="sold">Sold</option><option value="rented">Rented</option><option value="pending">Pending</option></select></label>
+<label class="form-field full">Description<textarea id="description" maxlength="3000" placeholder="Property details, features, nearby facilities…"></textarea></label>
+<label class="form-field full">Image URL (optional)<input id="imageUrl" type="url" placeholder="https://…"><span class="hint">Paste a direct HTTPS image URL. Uploads need a public Storage bucket configured separately.</span></label>
+<label class="form-field full">Video URL (optional)<input id="videoUrl" type="url" placeholder="https://…"></label>
+</div><div class="admin-actions"><button class="admin-button gold" type="submit" id="saveProperty">Save property</button><button class="admin-button" type="button" id="clearForm">Clear form</button></div><p id="formStatus" class="admin-status" role="status"></p></form></div>
+<div class="panel"><h2>Manage listings</h2><p class="hint">Use Edit to load a listing into the form. Changes go to the Supabase properties table.</p><div id="adminListings" class="admin-list">Loading…</div><p id="listStatus" class="admin-status" role="status"></p></div>
+</section></main>
+<script>
+(() => {
+const cfg=window.RUDR_CONFIG||{}, $=id=>document.getElementById(id);
+let client=null, user=null;
+const configured=cfg.SUPABASE_URL&&cfg.SUPABASE_PUBLISHABLE_KEY&&!cfg.SUPABASE_URL.includes('PASTE_')&&!cfg.SUPABASE_PUBLISHABLE_KEY.includes('PASTE_');
+if(!configured){$('configWarning').classList.remove('hidden');$('loginPanel').classList.add('hidden');return;}
+client=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_PUBLISHABLE_KEY);
+function say(id,msg){$(id).textContent=msg;}
+function showDashboard(){ $('loginPanel').classList.add('hidden');$('dashboard').classList.remove('hidden');$('signOut').classList.remove('hidden');loadListings(); }
+function checkAdmin(u){return !!u&&String(u.email||'').toLowerCase()===String(cfg.ADMIN_EMAIL||'').toLowerCase();}
+async function refreshSession(){const {data}=await client.auth.getSession();if(data.session&&checkAdmin(data.session.user)){user=data.session.user;showDashboard();}else if(data.session){await client.auth.signOut();say('loginStatus','This account is not authorized as the configured admin email.');}}
+$('signIn').addEventListener('click',async()=>{say('loginStatus','Signing in…');const {data,error}=await client.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});if(error){say('loginStatus',error.message);return;}if(!checkAdmin(data.user)){await client.auth.signOut();say('loginStatus','This email is not the configured admin account.');return;}user=data.user;showDashboard();});
+$('signOut').addEventListener('click',async()=>{await client.auth.signOut();user=null;$('dashboard').classList.add('hidden');$('loginPanel').classList.remove('hidden');$('signOut').classList.add('hidden');say('loginStatus','Signed out.');});
+function clearForm(){$('propertyForm').reset();$('propertyId').value='';$('formTitle').textContent='Add a property';$('status').value='available';say('formStatus','');}
+$('clearForm').addEventListener('click',clearForm);
+$('propertyForm').addEventListener('submit',async e=>{e.preventDefault();if(!checkAdmin(user)){say('formStatus','Please sign in with the authorized admin account.');return;}
+const row={title:$('title').value.trim(),location:$('location').value.trim(),price:$('price').value.trim(),property_type:$('propertyType').value,area:$('area').value.trim(),description:$('description').value.trim(),image_urls:$('imageUrl').value.trim(),video_url:$('videoUrl').value.trim(),status:$('status').value};
+say('formStatus','Saving…');const id=$('propertyId').value;
+const result=id?await client.from('properties').update(row).eq('id',id):await client.from('properties').insert(row);
+if(result.error){say('formStatus','Save failed: '+result.error.message);return;}say('formStatus','Saved successfully.');clearForm();await loadListings();});
+async function loadListings(){say('listStatus','Loading listings…');const {data,error}=await client.from('properties').select('*').order('created_at',{ascending:false});if(error){$('adminListings').textContent='Could not load listings: '+error.message;say('listStatus','Check your RLS policies and table permissions.');return;}
+if(!data||!data.length){$('adminListings').textContent='No listings yet. Add your first property above.';say('listStatus','');return;}
+$('adminListings').innerHTML=data.map(p=>`<div class="admin-row"><div><strong>${escapeHtml(p.title||'Untitled property')}</strong><small>${escapeHtml(p.location||'Location not set')} · ${escapeHtml(p.property_type||'Property')} · ${escapeHtml(p.status||'')}</small></div><div class="admin-actions" style="margin:0"><button class="admin-button" data-edit="${escapeHtml(p.id)}">Edit</button><button class="admin-button danger" data-delete="${escapeHtml(p.id)}">Delete</button></div></div>`).join('');
+$('adminListings').querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>{const p=data.find(x=>String(x.id)===b.dataset.edit);if(!p)return;$('propertyId').value=p.id;$('title').value=p.title||'';$('location').value=p.location||'';$('price').value=p.price||'';$('propertyType').value=p.property_type||'Residential';$('area').value=p.area||'';$('status').value=p.status||'available';$('description').value=p.description||'';$('imageUrl').value=Array.isArray(p.image_urls)?p.image_urls.join(', '):(p.image_urls||'');$('videoUrl').value=p.video_url||'';$('formTitle').textContent='Edit property';window.scrollTo({top:0,behavior:'smooth'});}));
+$('adminListings').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',async()=>{const p=data.find(x=>String(x.id)===b.dataset.delete);if(!p||!confirm(`Delete "${p.title}"? This cannot be undone.`))return;const {error}=await client.from('properties').delete().eq('id',p.id);if(error){say('listStatus','Delete failed: '+error.message);return;}say('listStatus','Property deleted.');await loadListings();}));
+say('listStatus','');
+}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+refreshSession();
+})();
+</script></body></html>
