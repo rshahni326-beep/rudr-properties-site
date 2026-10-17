@@ -5,8 +5,8 @@
   Never place a secret/service_role key in browser code.
 */
 window.RUDR_CONFIG = {
-  SUPABASE_URL: "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE",
-  SUPABASE_PUBLISHABLE_KEY: "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE",
+  SUPABASE_URL: "https://kfirvycfmodwavkendea.supabase.co/rest/v1/",
+  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_lSxGDChdMrQjcGUU0i65tA_LELVkwxh",
   WHATSAPP_NUMBER: "918887036646",
   CONTACT_EMAIL: "rshahni326@gmail.com",
   ADMIN_EMAIL: "rshahni326@gmail.com",
