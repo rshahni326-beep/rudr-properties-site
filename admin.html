@@ -45,11 +45,85 @@ $('signIn').addEventListener('click',async()=>{say('loginStatus','Signing in…'
 $('signOut').addEventListener('click',async()=>{await client.auth.signOut();user=null;$('dashboard').classList.add('hidden');$('loginPanel').classList.remove('hidden');$('signOut').classList.add('hidden');say('loginStatus','Signed out.');});
 function clearForm(){$('propertyForm').reset();$('propertyId').value='';$('formTitle').textContent='Add a property';$('status').value='available';say('formStatus','');}
 $('clearForm').addEventListener('click',clearForm);
-$('propertyForm').addEventListener('submit',async e=>{e.preventDefault();if(!checkAdmin(user)){say('formStatus','Please sign in with the authorized admin account.');return;}
-const row={title:$('title').value.trim(),location:$('location').value.trim(),price:$('price').value.trim(),property_type:$('propertyType').value,area:$('area').value.trim(),description:$('description').value.trim(),image_urls:$('imageUrl').value.trim(),video_url:$('videoUrl').value.trim(),status:$('status').value};
-say('formStatus','Saving…');const id=$('propertyId').value;
-const result=id?await client.from('properties').update(row).eq('id',id):await client.from('properties').insert(row);
-if(result.error){say('formStatus','Save failed: '+result.error.message);return;}say('formStatus','Saved successfully.');clearForm();await loadListings();});
+$('propertyForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  if (!checkAdmin(user)) {
+    say('formStatus', 'Please sign in with the authorized admin account.');
+    return;
+  }
+
+  const files = Array.from($('imageFiles').files || []);
+  const urls = [];
+
+  const existing = $('propertyId').value
+    ? String($('imageUrl').value || '').trim()
+    : '';
+
+  if (existing) urls.push(existing);
+
+  for (const file of files) {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      say('formStatus', 'Please select JPG, PNG, or WEBP images only.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      say('formStatus', 'Each photo must be 5 MB or smaller.');
+      return;
+    }
+  }
+
+  say('formStatus', 'Uploading photos and saving property…');
+  $('saveProperty').disabled = true;
+
+  try {
+    for (const file of files) {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `${user.id}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+
+      const { error: uploadError } = await client.storage
+        .from('property-images')
+        .upload(path, file, { contentType: file.type, upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data: publicData } = client.storage
+        .from('property-images')
+        .getPublicUrl(path);
+
+      urls.push(publicData.publicUrl);
+    }
+
+    const row = {
+      title: $('title').value.trim(),
+      location: $('location').value.trim(),
+      price: $('price').value.trim(),
+      property_type: $('propertyType').value,
+      area: $('area').value.trim(),
+      description: $('description').value.trim(),
+      image_urls: urls.join(','),
+      video_url: $('videoUrl').value.trim(),
+      status: $('status').value
+    };
+
+    const id = $('propertyId').value;
+    const result = id
+      ? await client.from('properties').update(row).eq('id', id)
+      : await client.from('properties').insert(row);
+
+    if (result.error) throw result.error;
+
+    say('formStatus', 'Property saved successfully!');
+    clearForm();
+    await loadListings();
+
+  } catch (error) {
+    say('formStatus', 'Error: ' + error.message);
+  } finally {
+    $('saveProperty').disabled = false;
+  }
+});
 async function loadListings(){say('listStatus','Loading listings…');const {data,error}=await client.from('properties').select('*').order('created_at',{ascending:false});if(error){$('adminListings').textContent='Could not load listings: '+error.message;say('listStatus','Check your RLS policies and table permissions.');return;}
 if(!data||!data.length){$('adminListings').textContent='No listings yet. Add your first property above.';say('listStatus','');return;}
 $('adminListings').innerHTML=data.map(p=>`<div class="admin-row"><div><strong>${escapeHtml(p.title||'Untitled property')}</strong><small>${escapeHtml(p.location||'Location not set')} · ${escapeHtml(p.property_type||'Property')} · ${escapeHtml(p.status||'')}</small></div><div class="admin-actions" style="margin:0"><button class="admin-button" data-edit="${escapeHtml(p.id)}">Edit</button><button class="admin-button danger" data-delete="${escapeHtml(p.id)}">Delete</button></div></div>`).join('');
