@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rshahni326-beep.github.io/rudr-properties-site/sitemap.xml
