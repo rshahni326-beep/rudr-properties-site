@@ -101,33 +101,32 @@ if (selectedFiles.length === 0 && !$('imageUrl').value.trim() && !selectedVideo 
       return;
     }
   }
-    if (selectedVideo) {
-      const safeVideoName = selectedVideo.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const videoPath = `${user.id}/${Date.now()}-${crypto.randomUUID()}-${safeVideoName}`;
+        try {
+      if (selectedVideo) {
+        const safeVideoName = selectedVideo.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const videoPath = `${user.id}/${Date.now()}-${crypto.randomUUID()}-${safeVideoName}`;
 
-      say('formStatus', 'Uploading video…');
-      console.log('Video upload started', {
-  name: selectedVideo.name,
-  size: selectedVideo.size,
-  type: selectedVideo.type
-});
-     say('formStatus', 'Starting video upload request…');
-      const { error: videoUploadError } = await client.storage
-        .from('property-videos')
-        .upload(videoPath, selectedVideo, {
-          contentType: selectedVideo.type,
-          upsert: false
-        });
+        say('formStatus', 'Uploading video…');
 
-      if (videoUploadError) throw videoUploadError;
-      say('formStatus', 'Video upload request finished.');
-      say('formStatus', 'Video uploaded successfully. Saving property…');
-      const { data: videoPublicData } = client.storage
-        .from('property-videos')
-        .getPublicUrl(videoPath);
+        const { error: videoUploadError } = await client.storage
+          .from('property-videos')
+          .upload(videoPath, selectedVideo, {
+            contentType: selectedVideo.type,
+            upsert: false
+          });
 
-      videoUrl = videoPublicData.publicUrl;
-    }
+        if (videoUploadError) throw videoUploadError;
+
+        const { data: videoPublicData } = client.storage
+          .from('property-videos')
+          .getPublicUrl(videoPath);
+
+        videoUrl = videoPublicData.publicUrl;
+      }
+    } catch (error) {
+      say('formStatus', 'Video upload error: ' + error.message);
+      return;
+        }
     say('formStatus', 'Uploading photos and saving property…');
   $('saveProperty').disabled = true;
 
