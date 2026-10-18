@@ -133,26 +133,34 @@ async function loadListings(){say('listStatus','Loading listings…');const {dat
 if(!data||!data.length){$('adminListings').textContent='No listings yet. Add your first property above.';say('listStatus','');return;}
 $('adminListings').innerHTML=data.map(p=>`<div class="admin-row"><div><strong>${escapeHtml(p.title||'Untitled property')}</strong><small>${escapeHtml(p.location||'Location not set')} · ${escapeHtml(p.property_type||'Property')} · ${escapeHtml(p.status||'')}</small></div><div class="admin-actions" style="margin:0"><button class="admin-button" data-edit="${escapeHtml(p.id)}">Edit</button><button class="admin-button danger" data-delete="${escapeHtml(p.id)}">Delete</button></div></div>`).join('');
 $('adminListings').querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>{const p=data.find(x=>String(x.id)===b.dataset.edit);if(!p)return;$('propertyId').value=p.id;$('title').value=p.title||'';$('location').value=p.location||'';$('price').value=p.price||'';$('propertyType').value=p.property_type||'Residential';$('area').value=p.area||'';$('status').value=p.status||'available';$('description').value=p.description||'';$('imageUrl').value=Array.isArray(p.image_urls)?p.image_urls.join(', '):(p.image_urls||'');$('videoUrl').value=p.video_url||'';$('formTitle').textContent='Edit property';window.scrollTo({top:0,behavior:'smooth'});}));
-$('adminListings').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',async()=>{const p=data.find(x=>String(x.id)===b.dataset.delete);if(!p||!confirm(`Delete "${p.title}"? This cannot be undone.`))return;const {data,error}=await client
-  .from('properties')
-  .delete()
-  .eq('id',p.id)
-  .select('id');
+$('adminListings').querySelectorAll('[data-delete]').forEach(b => {
+  b.addEventListener('click', async () => {
+    const p = data.find(x => String(x.id) === b.dataset.delete);
+    if (!p || !confirm(`Delete "${p.title}"? This cannot be undone.`)) return;
 
-if(error){
-  say('listStatus','Delete failed: '+error.message);
-  return;
-}
+    say('listStatus', 'Deleting property...');
 
-if(!data || data.length===0){
-  say('listStatus','Delete blocked. Check Supabase DELETE permission.');
-  return;
-}
+    const { data: deleted, error } = await client
+      .from('properties')
+      .delete()
+      .eq('id', p.id)
+      .select('id');
 
-say('listStatus','Property deleted successfully!');
-await loadListings();if(error){say('listStatus','Delete failed: '+error.message);return;}say('listStatus','Property deleted.');await loadListings();}));
-say('listStatus','');
-}
+    if (error) {
+      say('listStatus', 'Delete failed: ' + error.message);
+      return;
+    }
+
+    if (!deleted || deleted.length === 0) {
+      say('listStatus', 'Delete blocked. Check Supabase DELETE permission.');
+      return;
+    }
+
+    say('listStatus', 'Property deleted successfully!');
+    await loadListings();
+  });
+});
+say('listStatus', '');
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 refreshSession();
 })();
