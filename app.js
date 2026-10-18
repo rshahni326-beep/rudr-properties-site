@@ -15,11 +15,16 @@
     {title:'Commercial Space',location:'Hazratganj, Lucknow',price:'Price on request',property_type:'Commercial',area:'Shops and office enquiries',description:'A commercial opportunity for your business requirements.',image_urls:'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=900&q=80',status:'available'}
   ];
   function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-  function imageFor(p){
-    let raw = p.image_urls || '';
-    if(Array.isArray(raw)) raw = raw[0] || '';
+  function imageFor(p) {
+  let raw = p.image_urls || '';
+
+  if (Array.isArray(raw)) {
+    raw = raw[0] || '';
+  } else {
     raw = String(raw).split(',')[0].trim();
-    return /^https:\/\/[^\s"'<>]+$/i.test(raw) ? raw : '';
+  }
+
+  return /^https:\/\/[^\s"'<>]+$/i.test(raw) ? raw : '';
   }
   function whatsappLink(p){
     const txt = `Hello RUDR PROPERTIES, I am interested in ${p.title || 'a property'} in ${p.location || 'Lucknow'}. Please share details.`;
