@@ -111,7 +111,7 @@ if (selectedFiles.length === 0 && !$('imageUrl').value.trim() && !selectedVideo 
   size: selectedVideo.size,
   type: selectedVideo.type
 });
-
+     say('formStatus', 'Starting video upload request…');
       const { error: videoUploadError } = await client.storage
         .from('property-videos')
         .upload(videoPath, selectedVideo, {
@@ -120,6 +120,7 @@ if (selectedFiles.length === 0 && !$('imageUrl').value.trim() && !selectedVideo 
         });
 
       if (videoUploadError) throw videoUploadError;
+      say('formStatus', 'Video upload request finished.');
       say('formStatus', 'Video uploaded successfully. Saving property…');
       const { data: videoPublicData } = client.storage
         .from('property-videos')
