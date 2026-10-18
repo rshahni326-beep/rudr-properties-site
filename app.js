@@ -54,8 +54,7 @@
       const typ=String(p.property_type||'Property');
       const details=[p.area,p.description].filter(Boolean).join(' · ');
       return `<article class="property-card"><div class="property-photo">${imgs.length ? `<div style="display:flex;gap:8px;overflow-x:auto;">${photoHtml}</div>` : ''}
-${videoHtml}
-<span class="property-type">${esc(typ)}</span></div><div class="property-body"><h3>${esc(p.title||'Property')}</h3><div class="price">${esc(p.price||'Price on request')}</div><div class="property-location">⌖ ${esc(p.location||'Location on request')}</div><div class="property-desc">${esc(details||'Contact us for more details.')}</div><div class="card-actions"><a class="card-primary" href="${whatsappLink(p)}" target="_blank" rel="noopener">Enquire on WhatsApp ↗</a><a class="card-secondary" href="mailto:${encodeURIComponent(cfg.CONTACT_EMAIL||'rshahni326@gmail.com')}?subject=${encodeURIComponent('Property enquiry: '+(p.title||'Property'))}">Email</a></div></div></article>`;
+${videoHtml}<span class="property-type">${esc(typ)}</span></div><div class="property-body"><h3>${esc(p.title||'Property')}</h3><div class="price">${esc(p.price||'Price on request')}</div><div class="property-location">⌖ ${esc(p.location||'Location on request')}</div><div class="property-desc">${esc(details||'Contact us for more details.')}</div><div class="card-actions"><a class="card-primary" href="${whatsappLink(p)}" target="_blank" rel="noopener">Enquire on WhatsApp ↗</a><a class="card-secondary" href="mailto:${encodeURIComponent(cfg.CONTACT_EMAIL||'rshahni326@gmail.com')}?subject=${encodeURIComponent('Property enquiry: '+(p.title||'Property'))}">Email</a></div></div></article>`;
     }).join('');
   }
   function filter(){
