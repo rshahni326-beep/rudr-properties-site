@@ -15,16 +15,19 @@
     {title:'Commercial Space',location:'Hazratganj, Lucknow',price:'Price on request',property_type:'Commercial',area:'Shops and office enquiries',description:'A commercial opportunity for your business requirements.',image_urls:'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=900&q=80',status:'available'}
   ];
   function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-  function imageFor(p) {
+  function imagesFor(p) {
   let raw = p.image_urls || '';
 
   if (Array.isArray(raw)) {
-    raw = raw[0] || '';
-  } else {
-    raw = String(raw).split(',')[0].trim();
+    return raw.filter(url =>
+      /^https:\/\/[^\s"'<>]+$/i.test(url)
+    );
   }
 
-  return /^https:\/\/[^\s"'<>]+$/i.test(raw) ? raw : '';
+  return String(raw)
+    .split(',')
+    .map(url => url.trim())
+    .filter(url => /^https:\/\/[^\s"'<>]+$/i.test(url));
   }
   function whatsappLink(p){
     const txt = `Hello RUDR PROPERTIES, I am interested in ${p.title || 'a property'} in ${p.location || 'Lucknow'}. Please share details.`;
@@ -37,10 +40,10 @@
       return;
     }
     cards.innerHTML = list.map(p=>{
-      const img=imageFor(p);
+      const imgs = imagesFor(p);
       const typ=String(p.property_type||'Property');
       const details=[p.area,p.description].filter(Boolean).join(' · ');
-      return `<article class="property-card"><div class="property-photo">${img?`<img src="${esc(img)}" alt="${esc(p.title||'Property')}" loading="lazy" onerror="this.style.display='none'">`:''}<span class="property-type">${esc(typ)}</span></div><div class="property-body"><h3>${esc(p.title||'Property')}</h3><div class="price">${esc(p.price||'Price on request')}</div><div class="property-location">⌖ ${esc(p.location||'Location on request')}</div><div class="property-desc">${esc(details||'Contact us for more details.')}</div><div class="card-actions"><a class="card-primary" href="${whatsappLink(p)}" target="_blank" rel="noopener">Enquire on WhatsApp ↗</a><a class="card-secondary" href="mailto:${encodeURIComponent(cfg.CONTACT_EMAIL||'rshahni326@gmail.com')}?subject=${encodeURIComponent('Property enquiry: '+(p.title||'Property'))}">Email</a></div></div></article>`;
+      return `<article class="property-card"><div class="property-photo">${imgs.length ? `<div style="display:flex;gap:8px;overflow-x:auto;">${imgs.map(url => `<img src="${esc(url)}" alt="${esc(p.title||'Property')}" loading="lazy" style="width:100%;min-width:100%;height:220px;object-fit:cover;border-radius:8px;" onerror="this.style.display='none'">`).join('')}</div>` : ''}<span class="property-type">${esc(typ)}</span></div><div class="property-body"><h3>${esc(p.title||'Property')}</h3><div class="price">${esc(p.price||'Price on request')}</div><div class="property-location">⌖ ${esc(p.location||'Location on request')}</div><div class="property-desc">${esc(details||'Contact us for more details.')}</div><div class="card-actions"><a class="card-primary" href="${whatsappLink(p)}" target="_blank" rel="noopener">Enquire on WhatsApp ↗</a><a class="card-secondary" href="mailto:${encodeURIComponent(cfg.CONTACT_EMAIL||'rshahni326@gmail.com')}?subject=${encodeURIComponent('Property enquiry: '+(p.title||'Property'))}">Email</a></div></div></article>`;
     }).join('');
   }
   function filter(){
