@@ -80,7 +80,7 @@ $('propertyForm').addEventListener('submit', async e => {
   const urls = [];
   const selectedFiles = $('imageFiles').files;
 
-if (selectedFiles.length === 0 && !$('imageUrl').value.trim()) {
+if (selectedFiles.length === 0 && !$('imageUrl').value.trim() && !selectedVideo && !videoUrl) {
   say('formStatus', 'Please select at least one photo.');
   return;
 }
