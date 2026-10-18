@@ -17,7 +17,15 @@
 <label class="form-field">Area / size<input id="area" maxlength="120" placeholder="e.g. 2000 sq ft"></label>
 <label class="form-field">Status<select id="status"><option value="available">Available</option><option value="sold">Sold</option><option value="rented">Rented</option><option value="pending">Pending</option></select></label>
 <label class="form-field full">Description<textarea id="description" maxlength="3000" placeholder="Property details, features, nearby facilities…"></textarea></label>
-<label class="form-field full">Image URL (optional)<input id="imageUrl" type="url" placeholder="https://…"><span class="hint">Paste a direct HTTPS image URL. Uploads need a public Storage bucket configured separately.</span></label>
+<label class="form-field full">Upload Property Photos
+  <input id="imageFiles" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+  <span class="hint">Select multiple photos from your phone. Maximum 5 MB per photo.</span>
+</label>
+
+<label class="form-field full">Image URL (optional)
+  <input id="imageUrl" type="url" placeholder="https://…">
+  <span class="hint">You can also paste a direct HTTPS image URL.</span>
+</label>
 <label class="form-field full">Video URL (optional)<input id="videoUrl" type="url" placeholder="https://…"></label>
 </div><div class="admin-actions"><button class="admin-button gold" type="submit" id="saveProperty">Save property</button><button class="admin-button" type="button" id="clearForm">Clear form</button></div><p id="formStatus" class="admin-status" role="status"></p></form></div>
 <div class="panel"><h2>Manage listings</h2><p class="hint">Use Edit to load a listing into the form. Changes go to the Supabase properties table.</p><div id="adminListings" class="admin-list">Loading…</div><p id="listStatus" class="admin-status" role="status"></p></div>
