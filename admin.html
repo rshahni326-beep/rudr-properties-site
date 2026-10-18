@@ -26,7 +26,16 @@
   <input id="imageUrl" type="url" placeholder="https://…">
   <span class="hint">You can also paste a direct HTTPS image URL.</span>
 </label>
-<label class="form-field full">Video URL (optional)<input id="videoUrl" type="url" placeholder="https://…"></label>
+<label class="form-field full">
+  Upload Property Video
+  <input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime">
+  <span class="hint">Choose a video from your phone. Maximum 100 MB.</span>
+</label>
+
+<label class="form-field full">
+  Video URL (optional)
+  <input id="videoUrl" type="url" placeholder="https://…">
+</label>
 </div><div class="admin-actions"><button class="admin-button gold" type="submit" id="saveProperty">Save property</button><button class="admin-button" type="button" id="clearForm">Clear form</button></div><p id="formStatus" class="admin-status" role="status"></p></form></div>
 <div class="panel"><h2>Manage listings</h2><p class="hint">Use Edit to load a listing into the form. Changes go to the Supabase properties table.</p><div id="adminListings" class="admin-list">Loading…</div><p id="listStatus" class="admin-status" role="status"></p></div>
 </section></main>
@@ -46,6 +55,20 @@ $('signOut').addEventListener('click',async()=>{await client.auth.signOut();user
 function clearForm(){$('propertyForm').reset();$('propertyId').value='';$('formTitle').textContent='Add a property';$('status').value='available';say('formStatus','');}
 $('clearForm').addEventListener('click',clearForm);
 $('propertyForm').addEventListener('submit', async e => {
+    const selectedVideo = $('videoFile').files[0];
+  let videoUrl = $('videoUrl').value.trim();
+
+  if (selectedVideo) {
+    if (!['video/mp4', 'video/webm', 'video/quicktime'].includes(selectedVideo.type)) {
+      say('formStatus', 'Please choose MP4, WEBM, or MOV video.');
+      return;
+    }
+
+    if (selectedVideo.size > 100 * 1024 * 1024) {
+      say('formStatus', 'Video must be 100 MB or smaller.');
+      return;
+    }
+  }
   e.preventDefault();
 
   if (!checkAdmin(user)) {
@@ -78,8 +101,28 @@ if (selectedFiles.length === 0 && !$('imageUrl').value.trim()) {
       return;
     }
   }
+    if (selectedVideo) {
+      const safeVideoName = selectedVideo.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const videoPath = `${user.id}/${Date.now()}-${crypto.randomUUID()}-${safeVideoName}`;
 
-  say('formStatus', 'Uploading photos and saving property…');
+      say('formStatus', 'Uploading video…');
+
+      const { error: videoUploadError } = await client.storage
+        .from('property-videos')
+        .upload(videoPath, selectedVideo, {
+          contentType: selectedVideo.type,
+          upsert: false
+        });
+
+      if (videoUploadError) throw videoUploadError;
+
+      const { data: videoPublicData } = client.storage
+        .from('property-videos')
+        .getPublicUrl(videoPath);
+
+      videoUrl = videoPublicData.publicUrl;
+    }
+    say('formStatus', 'Uploading photos and saving property…');
   $('saveProperty').disabled = true;
 
   try {
@@ -108,7 +151,7 @@ if (selectedFiles.length === 0 && !$('imageUrl').value.trim()) {
       area: $('area').value.trim(),
       description: $('description').value.trim(),
       image_urls: urls.join(','),
-      video_url: $('videoUrl').value.trim(),
+      video_url: videoUrl,
       status: $('status').value
     };
 
