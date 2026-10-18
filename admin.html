@@ -120,7 +120,7 @@ if (selectedFiles.length === 0 && !$('imageUrl').value.trim() && !selectedVideo 
         });
 
       if (videoUploadError) throw videoUploadError;
-
+      say('formStatus', 'Video uploaded successfully. Saving property…');
       const { data: videoPublicData } = client.storage
         .from('property-videos')
         .getPublicUrl(videoPath);
