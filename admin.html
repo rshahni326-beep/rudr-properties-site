@@ -55,7 +55,12 @@ $('propertyForm').addEventListener('submit', async e => {
 
   const files = Array.from($('imageFiles').files || []);
   const urls = [];
+  const selectedFiles = $('imageFiles').files;
 
+if (selectedFiles.length === 0 && !$('imageUrl').value.trim()) {
+  say('formStatus', 'Please select at least one photo.');
+  return;
+}
   const existing = $('propertyId').value
     ? String($('imageUrl').value || '').trim()
     : '';
