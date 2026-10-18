@@ -108,12 +108,25 @@ if (selectedFiles.length === 0 && !$('imageUrl').value.trim() && !selectedVideo 
 
         say('formStatus', 'Uploading video…');
 
-        const { error: videoUploadError } = await client.storage
-          .from('property-videos')
-          .upload(videoPath, selectedVideo, {
-            contentType: selectedVideo.type,
-            upsert: false
-          });
+        const uploadPromise = client.storage
+  .from('property-videos')
+  .upload(videoPath, selectedVideo, {
+    contentType: selectedVideo.type,
+    upsert: false
+  });
+
+const timeoutPromise = new Promise((_, reject) => {
+  setTimeout(() => reject(new Error(
+    'Upload timed out. Check internet, Supabase Storage settings, and permissions.'
+  )), 30000);
+});
+
+const { error: videoUploadError } = await Promise.race([
+  uploadPromise,
+  timeoutPromise
+]);
+
+if (videoUploadError) throw videoUploadError;
 
         if (videoUploadError) throw videoUploadError;
 
