@@ -96,10 +96,16 @@
       throw new Error('Supabase configuration missing');
     }
 
-    const supabase = window.supabase.createClient(
-      cfg.SUPABASE_URL,
-      cfg.SUPABASE_PUBLISHABLE_KEY
-    );
+    if (!window.supabase || !window.supabase.createClient) {
+  message.textContent = 'Supabase लाइब्रेरी लोड नहीं हुई।';
+  sendButton.disabled = true;
+  throw new Error('Supabase library not loaded');
+}
+
+const supabase = window.supabase.createClient(
+  cfg.SUPABASE_URL,
+  cfg.SUPABASE_PUBLISHABLE_KEY
+);
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
