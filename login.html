@@ -4,19 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login | RUDR PROPERTIES</title>
+
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #101827;
-      color: #fff;
+      color: white;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
+
     .box {
       width: 100%;
       max-width: 420px;
@@ -25,9 +28,16 @@
       border-radius: 18px;
       padding: 26px;
     }
-    h1 { font-size: 25px; margin: 0 0 8px; }
+
+    h1 { font-size: 25px; }
+
     p { color: #cbd5e1; line-height: 1.5; }
-    label { display: block; margin: 18px 0 7px; }
+
+    label {
+      display: block;
+      margin: 18px 0 7px;
+    }
+
     input {
       width: 100%;
       padding: 13px;
@@ -37,6 +47,7 @@
       color: white;
       font-size: 16px;
     }
+
     button {
       width: 100%;
       padding: 13px;
@@ -49,109 +60,177 @@
       font-weight: bold;
       cursor: pointer;
     }
+
     button:disabled { opacity: .6; }
-    #message { overflow-wrap: anywhere; }
+
+    #message {
+      overflow-wrap: anywhere;
+    }
+
     a { color: #f5d48a; }
-    .back { display: inline-block; margin-top: 16px; }
+
+    .back {
+      display: inline-block;
+      margin-top: 16px;
+    }
   </style>
 </head>
+
 <body>
   <main class="box">
     <h1>RUDR PROPERTIES</h1>
+
     <p>पूरी प्रॉपर्टी जानकारी देखने के लिए अपने ईमेल से लॉगिन करें।</p>
 
     <form id="emailForm">
       <label for="email">ईमेल एड्रेस</label>
-      <input id="email" type="email" autocomplete="email"
-             placeholder="आपका ईमेल" required>
+
+      <input
+        id="email"
+        type="email"
+        autocomplete="email"
+        placeholder="आपका ईमेल"
+        required
+      >
+
       <button id="sendButton" type="submit">OTP भेजें</button>
     </form>
 
     <form id="otpForm" hidden>
       <label for="otp">ईमेल पर आया 6 अंकों का OTP</label>
-      <input id="otp" inputmode="numeric" autocomplete="one-time-code"
-             pattern="[0-9]{6}" maxlength="6" placeholder="123456" required>
-      <button id="verifyButton" type="submit">OTP सत्यापित करें</button>
+
+      <input
+        id="otp"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        pattern="[0-9]{6}"
+        maxlength="6"
+        placeholder="123456"
+        required
+      >
+
+      <button id="verifyButton" type="submit">
+        OTP सत्यापित करें
+      </button>
     </form>
 
-    <p id="message" role="status"></p>
-    <a class="back" href="./index.html">← वेबसाइट पर वापस जाएँ</a>
+    <p id="message" role="status" aria-live="polite">
+      लॉगिन सिस्टम शुरू हो रहा है...
+    </p>
+
+    <a class="back" href="./index.html">
+      ← वेबसाइट पर वापस जाएँ
+    </a>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./config.js"></script>
+
   <script>
-    const form = document.getElementById('emailForm');
-    const otpForm = document.getElementById('otpForm');
-    const emailInput = document.getElementById('email');
-    const otpInput = document.getElementById('otp');
-    const message = document.getElementById('message');
-    const sendButton = document.getElementById('sendButton');
-    const verifyButton = document.getElementById('verifyButton');
+    (() => {
+      const form = document.getElementById('emailForm');
+      const otpForm = document.getElementById('otpForm');
+      const emailInput = document.getElementById('email');
+      const otpInput = document.getElementById('otp');
+      const message = document.getElementById('message');
+      const sendButton = document.getElementById('sendButton');
+      const verifyButton = document.getElementById('verifyButton');
 
-    const cfg = window.RUDR_CONFIG;
-    if (!cfg || !cfg.SUPABASE_URL || !cfg.SUPABASE_PUBLISHABLE_KEY) {
-      message.textContent = 'सेटिंग नहीं मिली। कृपया वेबसाइट एडमिन से संपर्क करें।';
-      sendButton.disabled = true;
-      throw new Error('Supabase configuration missing');
-    }
-
-    if (!window.supabase || !window.supabase.createClient) {
-  message.textContent = 'Supabase लाइब्रेरी लोड नहीं हुई।';
-  sendButton.disabled = true;
-  throw new Error('Supabase library not loaded');
-}
-
-const supabase = window.supabase.createClient(
-  cfg.SUPABASE_URL,
-  cfg.SUPABASE_PUBLISHABLE_KEY
-);
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      sendButton.disabled = true;
-      message.textContent = 'OTP भेजा जा रहा है...';
+      function showError(prefix, error) {
+        message.textContent =
+          prefix + (error && error.message
+            ? error.message
+            : 'अज्ञात त्रुटि');
+      }
 
       try {
-        const { error } = await supabase.auth.signInWithOtp({
-          email: emailInput.value.trim(),
-          options: { shouldCreateUser: true }
+        const cfg = window.RUDR_CONFIG;
+
+        if (!cfg ||
+            !cfg.SUPABASE_URL ||
+            !cfg.SUPABASE_PUBLISHABLE_KEY) {
+          throw new Error(
+            'config.js में Supabase URL या Publishable Key नहीं मिली।'
+          );
+        }
+
+        if (!window.supabase ||
+            !window.supabase.createClient) {
+          throw new Error(
+            'Supabase लाइब्रेरी लोड नहीं हुई। इंटरनेट कनेक्शन जाँचें।'
+          );
+        }
+
+        const client = window.supabase.createClient(
+          cfg.SUPABASE_URL,
+          cfg.SUPABASE_PUBLISHABLE_KEY
+        );
+
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+
+          const email = emailInput.value.trim();
+
+          if (!email) {
+            message.textContent = 'कृपया अपना ईमेल डालें।';
+            return;
+          }
+
+          sendButton.disabled = true;
+          message.textContent = 'OTP भेजा जा रहा है...';
+
+          try {
+            const { error } = await client.auth.signInWithOtp({
+              email,
+              options: { shouldCreateUser: true }
+            });
+
+            if (error) throw error;
+
+            otpForm.hidden = false;
+            message.textContent =
+              'OTP भेजने का अनुरोध सफल हुआ। अपना Inbox और Spam/Junk फ़ोल्डर जाँचें।';
+            otpInput.focus();
+          } catch (error) {
+            showError('OTP नहीं भेजा जा सका: ', error);
+          } finally {
+            sendButton.disabled = false;
+          }
         });
-        if (error) throw error;
 
-        otpForm.hidden = false;
-        message.textContent =
-          'यदि OTP आया है, तो अपने ईमेल में उसे देखें। Spam/Junk फ़ोल्डर भी जाँचें।';
-        otpInput.focus();
-      } catch (error) {
-        message.textContent = 'OTP नहीं भेजा जा सका: ' + error.message;
-      } finally {
-        sendButton.disabled = false;
-      }
-    });
+        otpForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
 
-    otpForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      verifyButton.disabled = true;
-      message.textContent = 'OTP जाँचा जा रहा है...';
+          verifyButton.disabled = true;
+          message.textContent = 'OTP सत्यापित किया जा रहा है...';
 
-      try {
-        const { error } = await supabase.auth.verifyOtp({
-          email: emailInput.value.trim(),
-          token: otpInput.value.trim(),
-          type: 'email'
+          try {
+            const { error } = await client.auth.verifyOtp({
+              email: emailInput.value.trim(),
+              token: otpInput.value.trim(),
+              type: 'email'
+            });
+
+            if (error) throw error;
+
+            message.textContent =
+              'लॉगिन सफल! वेबसाइट खोली जा रही है...';
+
+            window.location.replace('./index.html');
+          } catch (error) {
+            showError('OTP सत्यापित नहीं हुआ: ', error);
+          } finally {
+            verifyButton.disabled = false;
+          }
         });
-        if (error) throw error;
 
-        message.textContent = 'लॉगिन सफल! वेबसाइट खोली जा रही है...';
-        window.location.replace('./index.html');
+        message.textContent = 'ईमेल से लॉगिन करने के लिए तैयार।';
+
       } catch (error) {
-        message.textContent =
-          'OTP सत्यापित नहीं हुआ: ' + error.message;
-      } finally {
-        verifyButton.disabled = false;
+        showError('लॉगिन सिस्टम शुरू नहीं हुआ: ', error);
+        sendButton.disabled = true;
       }
-    });
+    })();
   </script>
 </body>
 </html>
