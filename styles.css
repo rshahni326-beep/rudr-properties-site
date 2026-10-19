@@ -30,3 +30,160 @@
 .card-actions .card-secondary {
   order: 3;
 }
+/* ==================================
+   RUDR PROPERTIES - PREMIUM DESIGN
+   ================================== */
+
+/* Premium property cards */
+.property-card {
+  background: #ffffff;
+  border: 1px solid #e9e2d3;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 22px rgba(20, 20, 20, 0.07);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.property-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(20, 20, 20, 0.12);
+}
+
+/* Property images */
+.property-photo {
+  overflow: hidden;
+  background: #f4f1e9;
+}
+
+.property-photo img {
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.property-card:hover .property-photo img {
+  transform: scale(1.025);
+}
+
+/* Property information */
+.property-body {
+  padding: 20px;
+}
+
+.property-body h3 {
+  color: #191919;
+  font-size: 21px;
+  line-height: 1.4;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.property-body .price {
+  color: #92712e;
+  font-size: 22px;
+  font-weight: 800;
+  margin: 12px 0;
+}
+
+.property-location {
+  color: #66615a;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.property-desc {
+  color: #666666;
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+
+/* Property category badge */
+.property-type {
+  display: inline-block;
+  background: #191919;
+  color: #e7cb82;
+  padding: 7px 13px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin: 12px;
+}
+
+/* Property action buttons */
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.card-actions a {
+  box-sizing: border-box;
+  flex: 1 1 100%;
+  min-width: 0;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* WhatsApp button */
+.card-actions .card-primary {
+  background: #202020;
+  color: #ffffff;
+  border: 1px solid #202020;
+}
+
+.card-actions .card-primary:hover {
+  background: #3a3a3a;
+}
+
+/* View Details - premium gold */
+.card-actions .view-details-button {
+  background: #f8f1df;
+  color: #73571e;
+  border: 1px solid #c7a75c;
+}
+
+.card-actions .view-details-button:hover {
+  background: #ead8a9;
+  color: #30240d;
+}
+
+/* Email button */
+.card-actions .card-secondary {
+  background: #ffffff;
+  color: #202020;
+  border: 1px solid #d7d1c4;
+}
+
+.card-actions .card-secondary:hover {
+  background: #f3efe6;
+}
+
+/* Small mobile screens */
+@media (max-width: 520px) {
+  .property-body {
+    padding: 16px;
+  }
+
+  .property-body h3 {
+    font-size: 19px;
+  }
+
+  .property-body .price {
+    font-size: 21px;
+  }
+
+  .card-actions a {
+    flex-basis: 100%;
+    width: 100%;
+  }
+}
