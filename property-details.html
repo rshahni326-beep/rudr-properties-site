@@ -33,6 +33,67 @@
     .details-error{background:#fff;padding:30px;text-align:center;border:1px solid #e9e5dc}
     .details-error h2{font-family:"Playfair Display",serif}
     @media(max-width:750px){.details-layout{grid-template-columns:1fr}.gallery-main{height:280px}.details-info h1{font-size:28px}.details-page{margin-top:22px;padding:0 14px}}
+  /* Premium mobile-friendly video player */
+.gallery-main {
+  position: relative;
+  min-height: 240px;
+}
+
+.gallery-main video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  max-height: 500px;
+  object-fit: contain;
+  background: #10110f;
+}
+
+.gallery-main .video-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 76px;
+  height: 76px;
+  border: 2px solid #e0c477;
+  border-radius: 50%;
+  background: rgba(16, 17, 15, 0.88);
+  color: #f3d78e;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.gallery-main .video-play-button[hidden] {
+  display: none;
+}
+
+.gallery-main .video-play-button:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 4px;
+}
+
+@media (max-width: 750px) {
+  .gallery-main {
+    height: 280px;
+    min-height: 240px;
+  }
+
+  .gallery-main video {
+    min-height: 240px;
+  }
+
+  .gallery-main .video-play-button {
+    width: 68px;
+    height: 68px;
+    font-size: 29px;
+  }
+}
   </style>
 </head>
 <body>
@@ -152,12 +213,43 @@
           img.alt = item.label;
           main.appendChild(img);
         } else if (item.type === 'video') {
-          const v = document.createElement('video');
-          v.src = item.src;
-          v.controls = true;
-          v.playsInline = true;
-          v.preload = 'metadata';
-          main.appendChild(v);
+  const v = document.createElement('video');
+
+  v.src = item.src;
+  v.controls = true;
+  v.playsInline = true;
+  v.preload = 'metadata';
+  v.setAttribute('aria-label', 'Property video');
+
+  const playButton = document.createElement('button');
+  playButton.type = 'button';
+  playButton.className = 'video-play-button';
+  playButton.textContent = '▶';
+  playButton.setAttribute('aria-label', 'Play property video');
+
+  playButton.addEventListener('click', async () => {
+    try {
+      await v.play();
+    } catch (error) {
+      console.error('Video playback error:', error);
+    }
+  });
+
+  v.addEventListener('play', () => {
+    playButton.hidden = true;
+  });
+
+  v.addEventListener('pause', () => {
+    if (!v.ended) playButton.hidden = false;
+  });
+
+  v.addEventListener('ended', () => {
+    playButton.hidden = false;
+  });
+
+  main.appendChild(v);
+  main.appendChild(playButton);
+        }
         } else {
           const span = document.createElement('span');
           span.textContent = item.label;
