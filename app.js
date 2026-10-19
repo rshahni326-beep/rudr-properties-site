@@ -51,7 +51,7 @@
        </video>
      </div>`
   : '';
-
+    console.log('VIDEO CHECK:', p.title, p.video_url);
       const typ=String(p.property_type||'Property');
       const details=[p.area,p.description].filter(Boolean).join(' · ');
       return `<article class="property-card"><div class="property-photo">${imgs.length ? `<div style="display:flex;gap:8px;overflow-x:auto;">${photoHtml}</div>` : ''}
