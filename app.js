@@ -42,6 +42,7 @@
     cards.innerHTML = list.map(p=>{
       const imgs = imagesFor(p);
       const photoHtml = imgs.map(url => '<img src="' + esc(url) + '" alt="' + esc(p.title || 'Property') + '" loading="lazy" style="width:100%;min-width:100%;height:220px;object-fit:cover;border-radius:8px;">').join('');
+      console.log("VIDEO URL CHECK:", p.title, p.video_url);
       const videoHtml = p.video_url
   ? `<div style="margin-top:12px;">
        <video src="${esc(p.video_url)}"
