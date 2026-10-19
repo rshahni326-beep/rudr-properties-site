@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#10110f">
+  <title>Property Details | RUDR PROPERTIES</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <style>
+    .details-page{max-width:1100px;margin:35px auto 70px;padding:0 20px}
+    .back-home{display:inline-block;background:#171914;color:#fff;padding:12px 18px;margin-bottom:24px;font-size:13px}
+    .details-layout{display:grid;grid-template-columns:1.15fr 1fr;gap:32px}
+    .gallery-main{height:390px;background:#e4e0d6;display:grid;place-items:center;overflow:hidden}
+    .gallery-main img,.gallery-main video{width:100%;height:100%;object-fit:cover}
+    .gallery-thumbs{display:flex;gap:10px;overflow-x:auto;margin-top:12px;padding-bottom:8px}
+    .gallery-thumbs button{padding:0;border:2px solid transparent;background:#ddd;flex:0 0 92px;height:72px;overflow:hidden;cursor:pointer}
+    .gallery-thumbs button.active{border-color:#c9a85d}
+    .gallery-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+    .details-info{background:#fff;padding:26px;border:1px solid #e9e5dc}
+    .details-info h1{font:600 34px/1.2 "Playfair Display",Georgia,serif;margin:8px 0 14px}
+    .details-price{font-size:24px;color:#9b7837;font-weight:700;margin-bottom:10px}
+    .details-location{color:#777;font-size:14px;margin-bottom:22px}
+    .details-label{font-size:10px;letter-spacing:2px;color:#9b7837;font-weight:700;margin-top:22px}
+    .details-description{white-space:pre-wrap;color:#555;font-size:14px}
+    .details-facts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .details-fact{background:#f6f4ef;padding:12px;font-size:13px}
+    .details-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}
+    .details-actions a{flex:1;text-align:center;padding:13px 12px;font-size:12px;font-weight:700}
+    .details-error{background:#fff;padding:30px;text-align:center;border:1px solid #e9e5dc}
+    .details-error h2{font-family:"Playfair Display",serif}
+    @media(max-width:750px){.details-layout{grid-template-columns:1fr}.gallery-main{height:280px}.details-info h1{font-size:28px}.details-page{margin-top:22px;padding:0 14px}}
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="./" aria-label="RUDR Properties home">
+    <span class="brand-mark">R</span>
+    <span><strong>RUDR <i>PROPERTIES</i></strong><small>YOUR PROPERTY PARTNER</small></span>
+  </a>
+</header>
+
+<main class="details-page">
+  <a class="back-home" href="./">← Back to Home</a>
+  <div id="detailsContent">
+    <div class="details-error"><h2>Loading property…</h2><p>Please wait.</p></div>
+  </div>
+</main>
+
+<footer>
+  <a class="brand footer-brand" href="./">
+    <span class="brand-mark">R</span>
+    <span><strong>RUDR <i>PROPERTIES</i></strong><small>YOUR PROPERTY PARTNER</small></span>
+  </a>
+  <p>Lucknow, Uttar Pradesh · <a href="mailto:rshahni326@gmail.com">rshahni326@gmail.com</a></p>
+  <p class="copyright">© <span id="year"></span> RUDR PROPERTIES. All rights reserved.</p>
+</footer>
+
+<script>
+(() => {
+  const cfg = window.RUDR_CONFIG || {};
+  const root = document.getElementById('detailsContent');
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function esc(v='') {
+    return String(v).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  function getImages(value) {
+    let arr = Array.isArray(value) ? value :
+      String(value || '').split(',').map(s => s.trim());
+    return arr.filter(url => /^https:\/\/[^\s"'<>]+$/i.test(url));
+  }
+
+  function showError(title, text) {
+    root.innerHTML = '<div class="details-error"><h2>' + esc(title) +
+      '</h2><p>' + esc(text) + '</p><p><a class="text-link" href="./">← Back to all properties</a></p></div>';
+  }
+
+  async function init() {
+    const id = new URLSearchParams(location.search).get('id');
+    if (!id) {
+      showError('Property not selected', 'Please return to the homepage and tap View Details on a property.');
+      return;
+    }
+
+    if (!cfg.SUPABASE_URL || !cfg.SUPABASE_PUBLISHABLE_KEY || !window.supabase) {
+      showError('Connection not ready', 'The property database could not be connected. Please try again later.');
+      return;
+    }
+
+    try {
+      const client = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
+      const {data, error} = await client.from('properties').select('*').eq('id', id).maybeSingle();
+      if (error) throw error;
+      if (!data) {
+        showError('Property not found', 'This property may no longer be available.');
+        return;
+      }
+
+      const p = data;
+      const images = getImages(p.image_urls);
+      const video = /^https:\/\/[^\s"'<>]+$/i.test(String(p.video_url || '')) ? p.video_url : '';
+      const waNumber = String(cfg.WHATSAPP_NUMBER || '918887036646').replace(/\D/g,'');
+      const waText = 'Hello RUDR PROPERTIES, I am interested in ' + (p.title || 'a property') + ' in ' + (p.location || 'Lucknow') + '. Please share details.';
+      const waLink = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent(waText);
+      const email = cfg.CONTACT_EMAIL || 'rshahni326@gmail.com';
+      const emailLink = 'mailto:' + email + '?subject=' + encodeURIComponent('Property enquiry: ' + (p.title || 'Property'));
+
+      const media = images.map((src,i) => ({type:'image',src,label:'Property photo '+(i+1)}));
+      if (video) media.push({type:'video',src:video,label:'Property video'});
+      if (!media.length) media.push({type:'placeholder',src:'',label:'No photo available'});
+
+      root.innerHTML = `
+        <div class="details-layout">
+          <section class="details-gallery" aria-label="Property photo gallery">
+            <div class="gallery-main" id="galleryMain"></div>
+            <div class="gallery-thumbs" id="galleryThumbs"></div>
+          </section>
+          <section class="details-info">
+            <p class="eyebrow">${esc(p.property_type || 'PROPERTY')}</p>
+            <h1>${esc(p.title || 'Property')}</h1>
+            <div class="details-price">${esc(p.price || 'Price on request')}</div>
+            <div class="details-location">⌖ ${esc(p.location || 'Location on request')}</div>
+            <div class="details-facts">
+              <div class="details-fact"><strong>Property Type</strong><br>${esc(p.property_type || 'Not specified')}</div>
+              <div class="details-fact"><strong>Area</strong><br>${esc(p.area || 'Contact for details')}</div>
+            </div>
+            <p class="details-label">PROPERTY DESCRIPTION</p>
+            <div class="details-description">${esc(p.description || 'Please contact us for more details about this property.')}</div>
+            <div class="details-actions">
+              <a class="card-primary" href="${waLink}" target="_blank" rel="noopener">Enquire on WhatsApp ↗</a>
+              <a class="card-secondary" href="${emailLink}">Enquire on Email</a>
+            </div>
+          </section>
+        </div>`;
+
+      const main = document.getElementById('galleryMain');
+      const thumbs = document.getElementById('galleryThumbs');
+
+      function selectMedia(index) {
+        const item = media[index];
+        main.replaceChildren();
+        if (item.type === 'image') {
+          const img = document.createElement('img');
+          img.src = item.src;
+          img.alt = item.label;
+          main.appendChild(img);
+        } else if (item.type === 'video') {
+          const v = document.createElement('video');
+          v.src = item.src;
+          v.controls = true;
+          v.playsInline = true;
+          v.preload = 'metadata';
+          main.appendChild(v);
+        } else {
+          const span = document.createElement('span');
+          span.textContent = item.label;
+          main.appendChild(span);
+        }
+        [...thumbs.children].forEach((btn,i) => btn.classList.toggle('active',i===index));
+      }
+
+      media.forEach((item,index) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.setAttribute('aria-label',item.label);
+        if (item.type === 'image') {
+          const img = document.createElement('img');
+          img.src = item.src;
+          img.alt = item.label;
+          btn.appendChild(img);
+        } else {
+          btn.textContent = '▶ VIDEO';
+        }
+        btn.addEventListener('click',() => selectMedia(index));
+        thumbs.appendChild(btn);
+      });
+      selectMedia(0);
+    } catch (err) {
+      console.error('Property details error:', err);
+      showError('Unable to load property', 'Please return to the homepage and try again. If this continues, check the database connection and access policies.');
+    }
+  }
+  init();
+})();
+</script>
+</body>
+</html>
