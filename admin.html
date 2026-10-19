@@ -57,8 +57,10 @@ $('clearForm').addEventListener('click',clearForm);
 $('propertyForm').addEventListener('submit', async e => {
     const selectedVideo = $('videoFile').files[0];
   let videoUrl = $('videoUrl').value.trim();
+    const oldVideoUrl = videoUrl;
 
   if (selectedVideo) {
+    videoUrl = videoUrl || oldVideoUrl;
     if (!['video/mp4', 'video/webm', 'video/quicktime'].includes(selectedVideo.type)) {
       say('formStatus', 'Please choose MP4, WEBM, or MOV video.');
       return;
