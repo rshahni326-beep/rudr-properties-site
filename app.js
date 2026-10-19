@@ -44,9 +44,9 @@
       const photoHtml = imgs.map(url => '<img src="' + esc(url) + '" alt="' + esc(p.title || 'Property') + '" loading="lazy" style="width:100%;min-width:100%;height:220px;object-fit:cover;border-radius:8px;">').join('');
       const videoHtml = p.video_url
   ? `<div style="margin-top:12px;">
-       <video controls playsinline preload="metadata"
+       <video src="${esc(p.video_url)}"
+         controls playsinline preload="metadata"
          style="width:100%;max-height:320px;border-radius:10px;background:#000;">
-         <source src="${esc(p.video_url)}" type="video/mp4">
          Your browser does not support video playback.
        </video>
      </div>`
