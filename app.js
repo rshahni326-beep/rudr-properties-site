@@ -43,8 +43,6 @@
       const imgs = imagesFor(p);
       const photoHtml = imgs.map(url => '<img src="' + esc(url) + '" alt="' + esc(p.title || 'Property') + '" loading="lazy" style="width:100%;min-width:100%;height:220px;object-fit:cover;border-radius:8px;">').join('');
       const videoHtml = p.video_url
-      console.log('VIDEO DEBUG:', p.title, p.video_url);
-     console.log('VIDEO DEBUG:', p.title, p.video_url);
   ? `<div style="margin-top:12px;">
        <video src="${esc(p.video_url)}"
          controls playsinline preload="metadata"
@@ -53,6 +51,8 @@
        </video>
      </div>`
   : '';
+
+console.log('VIDEO DEBUG:', p.title, p.video_url);
       const typ=String(p.property_type||'Property');
       const details=[p.area,p.description].filter(Boolean).join(' · ');
       return `<article class="property-card"><div class="property-photo">${imgs.length ? `<div style="display:flex;gap:8px;overflow-x:auto;">${photoHtml}</div>` : ''}
