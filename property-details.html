@@ -158,6 +158,9 @@
     try {
       const client = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
       const {data, error} = await client.from('properties').select('*').eq('id', id).maybeSingle();
+      console.log('Property ID:', id);
+console.log('Property data:', data);
+console.log('Property error:', error);
       if (error) throw error;
       if (!data) {
         showError('Property not found', 'This property may no longer be available.');
