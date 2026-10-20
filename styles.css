@@ -225,3 +225,26 @@
 .status-badge.pending {
   background: #7c3aed;
 }
+/* Property type badge position */
+.property-photo {
+  position: relative;
+}
+
+.property-photo .property-type {
+  position: absolute;
+  top: auto;
+  right: 12px;
+  bottom: 12px;
+  left: auto;
+  z-index: 6;
+  margin: 0;
+}
+
+/* Keep status badge separate */
+.property-photo .status-badge {
+  top: 12px;
+  left: 12px;
+  right: auto;
+  bottom: auto;
+  z-index: 7;
+}
