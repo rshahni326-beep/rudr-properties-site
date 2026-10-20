@@ -248,3 +248,31 @@
   bottom: auto;
   z-index: 7;
 }
+/* Fix property type badge position */
+.property-photo .property-type {
+  position: absolute !important;
+  top: auto !important;
+  right: 12px !important;
+  bottom: 12px !important;
+  left: auto !important;
+  z-index: 10 !important;
+  display: inline-block;
+  width: auto;
+  max-width: 70%;
+  padding: 8px 12px;
+  margin: 0;
+  background: #111;
+  color: #d9b86c;
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* Keep status badge on the upper left */
+.property-photo .status-badge {
+  position: absolute !important;
+  top: 12px !important;
+  left: 12px !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 20 !important;
+}
