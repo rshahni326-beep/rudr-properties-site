@@ -40,6 +40,15 @@
   <form class="search-panel" id="searchForm">
     <label class="search-field"><span>LOCATION</span><input id="locationSearch" placeholder="Try Gomti Nagar, Lucknow"></label>
     <label class="search-field"><span>PROPERTY TYPE</span><select id="typeSearch"><option value="">All property types</option><option value="Residential">Residential</option><option value="Plot">Plot & Land</option><option value="Commercial">Commercial</option></select></label>
+    <label class="search-field">
+  <span>MINIMUM BUDGET (₹)</span>
+  <input id="minPriceSearch" type="number" min="0" placeholder="e.g. 1000000">
+</label>
+
+<label class="search-field">
+  <span>MAXIMUM BUDGET (₹)</span>
+  <input id="maxPriceSearch" type="number" min="0" placeholder="e.g. 5000000">
+</label>
     <button class="gold-button search-button" type="submit">Search ↗</button>
   </form>
 </section>
