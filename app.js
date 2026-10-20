@@ -235,7 +235,7 @@
 
       allProperties = (data || []).filter(property =>
         !property.status ||
-        ['available', 'active', 'for sale', 'for rent'].includes(
+        ['available', 'active', 'for sale', 'for rent', 'rental', 'rent', 'sold', 'rented', 'under offer', 'pending'].includes(
           String(property.status).toLowerCase()
         )
       );
