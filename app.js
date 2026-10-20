@@ -195,6 +195,8 @@ const statusLabel = status === 'sold'
   }
 
   function filter() {
+    const minPrice = Number(document.getElementById('minPriceSearch')?.value || 0);
+const maxPrice = Number(document.getElementById('maxPriceSearch')?.value || 0);
     const location = document.getElementById('locationSearch').value.trim().toLowerCase();
     const type = document.getElementById('typeSearch').value.toLowerCase();
 
@@ -205,8 +207,11 @@ const statusLabel = status === 'sold'
       const locationMatches = !location || searchable.includes(location);
       const typeMatches =
         !type || String(property.property_type || '').toLowerCase() === type;
+      const price = Number(String(property.price || '').replace(/[^\d]/g, ''));
+const minMatches = !minPrice || price >= minPrice;
+const maxMatches = !maxPrice || price <= maxPrice;
 
-      return locationMatches && typeMatches;
+      return locationMatches && typeMatches && minMatches && maxMatches;
     });
 
     render(filtered);
