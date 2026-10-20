@@ -385,3 +385,57 @@
     gap: 12px;
   }
 }
+/* RUDR RP Premium Header Logo */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.brand-logo {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.brand-text strong {
+  color: #ffffff;
+  font-size: 17px;
+  letter-spacing: 1.5px;
+}
+
+.brand-text strong i {
+  color: #d9b86c;
+  font-style: normal;
+}
+
+.brand-text small {
+  color: #c9c2b4;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+@media (max-width: 600px) {
+  .brand-logo {
+    width: 46px;
+    height: 46px;
+  }
+
+  .brand-text strong {
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+
+  .brand-text small {
+    font-size: 8px;
+    letter-spacing: 1.2px;
+  }
+}
