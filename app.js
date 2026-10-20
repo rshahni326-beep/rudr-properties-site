@@ -108,6 +108,19 @@
       const images = imagesFor(property);
       const firstImage = images[0] || '';
       const propertyType = String(property.property_type || 'Property');
+      const status = String(property.status || 'available').trim().toLowerCase();
+
+const statusLabel = status === 'sold'
+  ? 'SOLD'
+  : ['rental', 'rent', 'for rent', 'rented'].includes(status)
+    ? 'FOR RENT'
+    : status === 'under offer'
+      ? 'UNDER OFFER'
+      : status === 'pending'
+        ? 'PENDING'
+        : status === 'active' || status === 'available' || status === 'for sale'
+          ? 'AVAILABLE'
+          : status.toUpperCase();
       const details = [property.area, property.description].filter(Boolean).join(' · ');
 
       const email = cfg.CONTACT_EMAIL || 'rshahni326@gmail.com';
@@ -123,6 +136,7 @@
       return `
         <article class="property-card">
           <div class="property-photo">
+          <span class="status-badge ${status}">${esc(statusLabel)}</span>
             ${firstImage
               ? `<img
                   src="${esc(firstImage)}"
