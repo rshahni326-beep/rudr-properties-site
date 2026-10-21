@@ -8,7 +8,7 @@ window.RUDR_CONFIG = {
   SUPABASE_URL: "https://kfirvycfmodwavkendea.supabase.co",
   SUPABASE_PUBLISHABLE_KEY: "sb_publishable_lSxGDChdMrQjcGUU0i65tA_LELVkwxh",
   WHATSAPP_NUMBER: "918887036646",
-  CONTACT_EMAIL: "rshahni326@gmail.com",
+  CONTACT_EMAIL: "rudrpropertieslko@gmail.com",
   ADMIN_EMAIL: "rshahni326@gmail.com",
   STORAGE_BUCKET: "property-images"
 };
