@@ -182,13 +182,6 @@ const statusLabel = status === 'sold'
               </a>
 
               ${viewDetailsButton}
-              <a
-  class="card-secondary"
-  href="https://wa.me/918887036646?text=${encodeURIComponent(`Hello Rudr Properties, I am interested in ${property.title || 'this property'}. Price: ${property.price || 'Please share price'}. Please share more details.`)}"
-  target="_blank"
-  rel="noopener noreferrer">
-  WhatsApp Enquiry
-</a>
 
               <a
                 class="card-secondary"
