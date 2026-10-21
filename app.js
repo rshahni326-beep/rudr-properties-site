@@ -123,7 +123,7 @@ const statusLabel = status === 'sold'
           : status.toUpperCase();
       const details = [property.area, property.description].filter(Boolean).join(' · ');
 
-      const email = cfg.CONTACT_EMAIL || 'rshahni326@gmail.com';
+      const email = cfg.CONTACT_EMAIL || 'rudrpropertieslko@gmail.com';
       const emailSubject = `Property enquiry: ${property.title || 'Property'}`;
 
       // Demo listings do not exist in Supabase, so their details link is omitted.
