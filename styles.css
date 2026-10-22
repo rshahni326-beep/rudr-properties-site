@@ -439,6 +439,33 @@
     letter-spacing: 1.2px;
   }
 }
+/* ===== Animations ===== */
+
+/* Scroll reveal */
 .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
 .reveal.show{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+/* Property cards */
+.property-card.reveal.show{transition:transform .35s ease,box-shadow .35s ease,opacity .8s ease}
+.property-card.show:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.property-photo img{transition:transform .6s ease}
+.property-card:hover .property-photo img{transform:scale(1.05)}
+
+/* Hero entrance */
+@keyframes rise{from{opacity:0;transform:translateY(30px);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+.hero-content > *{animation:rise .9s cubic-bezier(.2,.8,.2,1) backwards}
+.hero-content > :nth-child(1){animation-delay:.1s}
+.hero-content > :nth-child(2){animation-delay:.25s}
+.hero-content > :nth-child(3){animation-delay:.45s}
+.hero-content > :nth-child(4){animation-delay:.6s}
+.hero-content > :nth-child(5){animation-delay:.75s}
+.hero-badge{animation:rise 1s .9s cubic-bezier(.2,.8,.2,1) backwards}
+
+/* Navbar on scroll */
+.topbar{transition:background .3s,backdrop-filter .3s,box-shadow .3s}
+.topbar.scrolled{background:rgba(16,17,15,.88);backdrop-filter:blur(10px);box-shadow:0 6px 24px rgba(0,0,0,.3)}
+
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  .hero-content > *,.hero-badge{animation:none}
+}
