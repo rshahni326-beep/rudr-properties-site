@@ -24,6 +24,20 @@
   });
 
   let allProperties = [];
+    const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('show');
+        io.unobserve(e.target);
+        setTimeout(() => { e.target.style.transitionDelay = '0ms'; }, 1400);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  function observeReveals() {
+    document.querySelectorAll('.reveal:not(.show)').forEach(el => io.observe(el));
+  }
+  observeReveals();
 
   const demo = [
     {
@@ -104,7 +118,7 @@
       return;
     }
 
-    cards.innerHTML = list.map(property => {
+    cards.innerHTML = list.map((property, i) => {
       const images = imagesFor(property);
       const firstImage = images[0] || '';
       const propertyType = String(property.property_type || 'Property');
@@ -134,7 +148,7 @@ const statusLabel = status === 'sold'
         : `<a class="view-details-button" href="property-details.html?id=${encodeURIComponent(String(property.id))}">View Details</a>`;
 
       return `
-        <article class="property-card">
+        <article class="property-card reveal" style="transition-delay:${Math.min(i, 5) * 90}ms">
           <div class="property-photo">
           <span class="status-badge ${status}">${esc(statusLabel)}</span>
             ${firstImage
@@ -192,8 +206,10 @@ const statusLabel = status === 'sold'
           </div>
         </article>`;
     }).join('');
+    observeReveals();
   }
 
+  
   function filter() {
     const location = document.getElementById('locationSearch').value.trim().toLowerCase();
     const type = document.getElementById('typeSearch').value.toLowerCase();
@@ -271,8 +287,3 @@ const statusLabel = status === 'sold'
 
   init();
 })();
-const io = new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target);} });
-},{threshold:.15});
-function observeReveals(){ document.querySelectorAll('.reveal:not(.show)').forEach(el=>io.observe(el)); }
-observeReveals();
