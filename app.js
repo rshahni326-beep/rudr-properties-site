@@ -298,3 +298,51 @@ const statusLabel = status === 'sold'
 
   init();
 })();
+/* Login overlay: main page peeche, login upar */
+(() => {
+  let box = null;
+
+  const st = document.createElement('style');
+  st.textContent = `
+    #loginOverlay{position:fixed;inset:0;z-index:9999;background:rgba(6,7,6,.72);
+      -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transition:opacity .35s}
+    #loginOverlay.show{opacity:1}
+    #loginOverlay iframe{width:100%;height:100%;border:0;background:transparent;color-scheme:normal}
+    #loginOverlay .lo-close{position:absolute;top:14px;right:14px;z-index:2;width:42px;height:42px;
+      border-radius:50%;border:1px solid rgba(214,173,96,.5);background:rgba(16,17,15,.7);
+      color:#f1d28f;font-size:24px;line-height:1;cursor:pointer}
+  `;
+  document.head.appendChild(st);
+
+  function openLogin() {
+    if (box) return;
+    box = document.createElement('div');
+    box.id = 'loginOverlay';
+    box.innerHTML = '<button class="lo-close" aria-label="Close">×</button><iframe src="login.html" title="Login"></iframe>';
+    box.querySelector('.lo-close').addEventListener('click', closeLogin);
+    document.body.appendChild(box);
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => box.classList.add('show'));
+  }
+
+  function closeLogin() {
+    if (!box) return;
+    const b = box; box = null;
+    b.classList.remove('show');
+    document.body.style.overflow = '';
+    setTimeout(() => b.remove(), 350);
+  }
+
+  document.addEventListener('click', e => {
+    const a = e.target.closest('#loginLink');
+    if (!a || a.textContent.trim() !== 'Login') return;
+    e.preventDefault();
+    document.getElementById('mainNav')?.classList.remove('open');
+    openLogin();
+  });
+
+  addEventListener('keydown', e => { if (e.key === 'Escape') closeLogin(); });
+  addEventListener('message', e => {
+    if (e.origin === location.origin && e.data === 'rudr-close') closeLogin();
+  });
+})();
