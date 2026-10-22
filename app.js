@@ -271,3 +271,8 @@ const statusLabel = status === 'sold'
 
   init();
 })();
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target);} });
+},{threshold:.15});
+function observeReveals(){ document.querySelectorAll('.reveal:not(.show)').forEach(el=>io.observe(el)); }
+observeReveals();
