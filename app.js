@@ -24,6 +24,8 @@
   });
 
   let allProperties = [];
+    const topbar = document.querySelector('.topbar');
+  addEventListener('scroll', () => topbar.classList.toggle('scrolled', scrollY > 40), { passive: true });
     const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
