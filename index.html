@@ -1,216 +1,78 @@
-<!DOCTYPE html>
-<html lang="hi">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Login | RUDR PROPERTIES</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Poppins",Arial,sans-serif;background:#4a6cf7;color:#fff;min-height:100vh;display:grid;place-items:center;padding:20px;overflow-x:hidden}
-.stage{display:flex;align-items:flex-end;justify-content:center;gap:28px;width:100%;max-width:760px}
-
-/* Character */
-.char-wrap{position:relative;width:130px;height:270px;flex:none}
-#char{position:absolute;inset:0}
-#char svg{width:100%;height:100%;overflow:visible}
-.shadow{position:absolute;left:18px;bottom:-6px;width:94px;height:14px;border-radius:50%;background:rgba(0,0,0,.18);filter:blur(3px)}
-.part{transform-box:fill-box;transform-origin:50% 6%}
-.walking .legL{animation:swA .6s ease-in-out infinite alternate}
-.walking .legR{animation:swB .6s ease-in-out infinite alternate}
-.walking .armL{animation:swB .6s ease-in-out infinite alternate}
-.walking .armR{animation:swA .6s ease-in-out infinite alternate}
-.walking .bodyg{animation:bob .3s ease-in-out infinite alternate}
-@keyframes swA{from{transform:rotate(-26deg)}to{transform:rotate(26deg)}}
-@keyframes swB{from{transform:rotate(26deg)}to{transform:rotate(-26deg)}}
-@keyframes bob{to{transform:translateY(-4px)}}
-.armR{transition:transform .55s cubic-bezier(.34,1.56,.64,1)}
-.pull .armR{transform:rotate(-125deg)}
-#case{position:absolute;left:-30px;bottom:-4px;width:38px;opacity:0}
-#handcase{transition:opacity .1s}
-
-/* Form card */
-.card{width:100%;max-width:400px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:18px;padding:26px;box-shadow:0 24px 60px rgba(10,20,80,.35);opacity:0;transform:translateY(-140px) scale(.9);transition:opacity .5s,transform .8s cubic-bezier(.34,1.56,.64,1)}
-.card.in{opacity:1;transform:none}
-.card > *{opacity:0;transform:translateY(12px);transition:opacity .5s,transform .5s}
-.card.in > *{opacity:1;transform:none}
-.card.in > :nth-child(1){transition-delay:.35s}.card.in > :nth-child(2){transition-delay:.45s}.card.in > :nth-child(3){transition-delay:.55s}.card.in > :nth-child(4){transition-delay:.65s}.card.in > :nth-child(5){transition-delay:.75s}
-h1{font-size:25px;font-weight:700}
-.sub{margin-top:6px;font-size:14px;line-height:1.5;color:#e4e9ff}
-label{display:block;margin:18px 0 7px;font-size:14px}
-input{width:100%;padding:13px;border-radius:10px;border:2px solid transparent;background:#fff;color:#111827;font-size:16px;font-family:inherit;transition:border-color .25s,box-shadow .25s}
-input:focus{outline:none;border-color:#d6ad60;box-shadow:0 0 0 4px rgba(214,173,96,.35)}
-button{width:100%;padding:13px;margin-top:16px;border:0;border-radius:10px;background:#1fa85a;color:#fff;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;position:relative;transition:transform .2s,box-shadow .2s,opacity .2s}
-button:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.25)}
-button:disabled{opacity:.7}
-button.loading{color:transparent}
-button.loading::after{content:"";position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#otpForm:not([hidden]){animation:otpIn .5s cubic-bezier(.2,.8,.2,1)}
-@keyframes otpIn{from{opacity:0;transform:translateY(-12px)}}
-#message{margin-top:16px;font-size:14px;line-height:1.5;overflow-wrap:anywhere;color:#fff}
-.back{display:inline-block;margin-top:14px;color:#ffe6a8;font-size:14px}
-.card.shake{animation:shake .45s}
-@keyframes shake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
-
-@media (max-width:640px){
-  .stage{flex-direction:column;align-items:center;gap:14px}
-  .char-wrap{width:90px;height:187px}
-  .card{padding:22px}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RUDR PROPERTIES | Homes, Plots & Commercial Properties</title>
+<meta name="description" content="RUDR PROPERTIES helps you explore homes, residential plots, land and commercial properties across Uttar Pradesh, India. Contact us for property details, prices and enquiries.">
+<meta name="google-site-verification" content="5uJBfQiZEYgtz0FxVedeF8UdBGi_cYQgThJ8OJctFBE" />
+<meta name="google-site-verification" content="WHyOwgwHloOQdpq2dnIbBLSwBfg4pee4wuyHikJ9BLA" />
+<meta name="theme-color" content="#10110f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  "name": "RUDR PROPERTIES",
+  "url": "https://rudrproperties.devs.li/",
+  "description": "RUDR PROPERTIES helps people explore homes, residential plots, land and commercial properties across Uttar Pradesh, India.",
+  "areaServed": {
+    "@type": "State",
+    "name": "Uttar Pradesh",
+    "containedInPlace": {
+      "@type": "Country",
+      "name": "India"
+    }
+  },
+  "telephone": "+918887036646"
 }
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
-</style>
+</script>
 </head>
 <body>
-<div class="stage">
-  <div class="char-wrap" aria-hidden="true">
-    <div class="shadow"></div>
-    <div id="char">
-      <svg viewBox="0 0 120 270">
-        <g class="bodyg">
-          <g class="part legL"><rect x="47" y="150" width="18" height="88" rx="9" fill="#2b2f3a"/><path d="M42 236h26v10q0 6-6 6H46q-6 0-6-6z" fill="#161616"/></g>
-          <g class="part legR"><rect x="66" y="150" width="18" height="88" rx="9" fill="#2b2f3a"/><path d="M62 236h26v10q0 6-6 6H66q-6 0-6-6z" fill="#161616"/></g>
-          <rect x="38" y="82" width="46" height="80" rx="16" fill="#b9bcc4"/>
-          <rect x="56" y="84" width="10" height="70" rx="4" fill="#f4f4f6"/>
-          <g class="part armL"><rect x="26" y="88" width="14" height="66" rx="7" fill="#b9bcc4"/><circle cx="33" cy="157" r="8" fill="#f1c9a5"/>
-            <g id="handcase"><rect x="14" y="160" width="32" height="24" rx="4" fill="#6b3f1d"/><path d="M24 160v-6h12v6" stroke="#3b2210" stroke-width="3" fill="none"/></g></g>
-          <g class="part armR"><rect x="82" y="88" width="14" height="66" rx="7" fill="#b9bcc4"/><circle cx="89" cy="157" r="8" fill="#f1c9a5"/></g>
-          <rect x="53" y="68" width="16" height="18" rx="6" fill="#f1c9a5"/>
-          <circle cx="61" cy="50" r="25" fill="#f1c9a5"/>
-          <path d="M35 50Q36 20 62 22Q88 22 87 50Q78 34 61 36Q44 36 35 50Z" fill="#e8b93f"/>
-          <circle cx="52" cy="53" r="2.6" fill="#222"/><circle cx="70" cy="53" r="2.6" fill="#222"/>
-          <path d="M53 63q8 7 16 0" stroke="#a5543a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-        </g>
-      </svg>
-    </div>
-    <svg id="case" viewBox="0 0 38 34"><rect x="2" y="9" width="34" height="24" rx="4" fill="#6b3f1d"/><path d="M12 9V3h14v6" stroke="#3b2210" stroke-width="3" fill="none"/></svg>
+<header class="topbar">
+  <a class="brand" href="#home" aria-label="RUDR Properties home">
+  <img class="brand-logo" src="Golden%20RUDR%20Properties%20Emblem.png" alt="Rudr Properties Logo">
+  <span class="brand-text">
+    <strong>RUDR <i>PROPERTIES</i></strong>
+    <small>YOUR PROPERTY PARTNER</small>
+  </span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+  <nav id="mainNav"><a href="#home">Home</a><a href="#properties">Properties</a><a href="#about">About Us</a><a href="#contact">Contact</a><a class="nav-cta" href="#properties">Explore listings ↗</a></nav>
+</header>
+<main>
+<section class="hero" id="home">
+  <div class="hero-shade"></div><div class="hero-content">
+    <p class="eyebrow">LUXURY LIVING · SMART INVESTING</p>
+    <h1>Find a place<br><em>you'll call home.</em></h1>
+    <p class="hero-copy">
+  RUDR PROPERTIES helps you explore homes, residential plots, land and commercial properties across Uttar Pradesh, India.
+    </p>
+    <a class="gold-button" href="#properties">Explore properties <span>↗</span></a>
+    <div class="hero-note"><span class="note-line"></span> LOCAL KNOWLEDGE. PERSONAL SERVICE.</div>
   </div>
-
-  <main class="card" id="card">
-    <h1>RUDR PROPERTIES</h1>
-    <p class="sub">पूरी प्रॉपर्टी जानकारी देखने के लिए अपने ईमेल से लॉगिन करें।</p>
-    <div>
-      <form id="emailForm">
-        <label for="email">ईमेल एड्रेस</label>
-        <input id="email" type="email" autocomplete="email" placeholder="आपका ईमेल" required>
-        <button id="sendButton" type="submit">OTP भेजें</button>
-      </form>
-      <form id="otpForm" hidden>
-        <label for="otp">ईमेल पर आया 6 अंकों का OTP</label>
-        <input id="otp" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="123456" required>
-        <button id="verifyButton" type="submit">OTP सत्यापित करें</button>
-      </form>
-    </div>
-    <p id="message" role="status" aria-live="polite">लॉगिन सिस्टम शुरू हो रहा है...</p>
-    <a class="back" href="./index.html">← वेबसाइट पर वापस जाएँ</a>
-  </main>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./config.js"></script>
-<script>
-/* ===== Intro animation: walk in, drop briefcase, pull the form in ===== */
-(() => {
-  const char = document.getElementById('char');
-  const wrap = char.parentElement;
-  const card = document.getElementById('card');
-  const hand = document.getElementById('handcase');
-  const cs = document.getElementById('case');
-  const still = () => { hand.style.opacity = 0; cs.style.opacity = 1; card.classList.add('in'); };
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return still();
-
-  const mobile = matchMedia('(max-width:640px)').matches;
-  const from = mobile ? 'translateX(-60vw)' : 'translateX(-55vw)';
-  wrap.classList.add('walking');
-  char.animate([{ transform: from }, { transform: 'none' }], { duration: 2600, easing: 'linear', fill: 'backwards' })
-    .onfinish = () => {
-      wrap.classList.remove('walking');
-      hand.style.opacity = 0;
-      cs.animate([{ transform: 'translateY(-110px)', opacity: 1 }, { transform: 'translateY(0)', opacity: 1 }],
-        { duration: 450, easing: 'cubic-bezier(.5,0,1,.6)', fill: 'forwards' });
-      cs.style.opacity = 1;
-      setTimeout(() => { wrap.classList.add('pull'); }, 600);
-      setTimeout(() => { card.classList.add('in'); }, 900);
-      setTimeout(() => { wrap.classList.remove('pull'); }, 2000);
-    };
-})();
-
-/* ===== Login logic (Supabase OTP) ===== */
-(() => {
-  const form = document.getElementById('emailForm');
-  const otpForm = document.getElementById('otpForm');
-  const emailInput = document.getElementById('email');
-  const otpInput = document.getElementById('otp');
-  const message = document.getElementById('message');
-  const sendButton = document.getElementById('sendButton');
-  const verifyButton = document.getElementById('verifyButton');
-  const card = document.getElementById('card');
-
-  function shake() { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); }
-  function showError(prefix, error) {
-    shake();
-    message.textContent = prefix + (error && error.message ? error.message : 'अज्ञात त्रुटि');
-  }
-
-  try {
-    const cfg = window.RUDR_CONFIG;
-    if (!cfg || !cfg.SUPABASE_URL || !cfg.SUPABASE_PUBLISHABLE_KEY) {
-      throw new Error('config.js में Supabase URL या Publishable Key नहीं मिली।');
-    }
-    if (!window.supabase || !window.supabase.createClient) {
-      throw new Error('Supabase लाइब्रेरी लोड नहीं हुई। इंटरनेट कनेक्शन जाँचें।');
-    }
-    const client = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const email = emailInput.value.trim();
-      if (!email) { message.textContent = 'कृपया अपना ईमेल डालें।'; return; }
-      sendButton.disabled = true;
-      sendButton.classList.add('loading');
-      message.textContent = 'OTP भेजा जा रहा है...';
-      try {
-        const { error } = await client.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
-        if (error) throw error;
-        otpForm.hidden = false;
-        message.textContent = 'OTP भेजने का अनुरोध सफल हुआ। अपना Inbox और Spam/Junk फ़ोल्डर जाँचें।';
-        otpInput.focus();
-      } catch (error) {
-        showError('OTP नहीं भेजा जा सका: ', error);
-      } finally {
-        sendButton.disabled = false;
-        sendButton.classList.remove('loading');
-      }
-    });
-
-    otpForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      verifyButton.disabled = true;
-      verifyButton.classList.add('loading');
-      message.textContent = 'OTP सत्यापित किया जा रहा है...';
-      try {
-        const { error } = await client.auth.verifyOtp({
-          email: emailInput.value.trim(),
-          token: otpInput.value.trim(),
-          type: 'email'
-        });
-        if (error) throw error;
-        message.textContent = 'लॉगिन सफल! वेबसाइट खोली जा रही है...';
-        window.location.replace('./index.html');
-      } catch (error) {
-        showError('OTP सत्यापित नहीं हुआ: ', error);
-      } finally {
-        verifyButton.disabled = false;
-        verifyButton.classList.remove('loading');
-      }
-    });
-
-    message.textContent = 'ईमेल से लॉगिन करने के लिए तैयार।';
-  } catch (error) {
-    showError('लॉगिन सिस्टम शुरू नहीं हुआ: ', error);
-    sendButton.disabled = true;
-  }
-})();
-</script>
-</body>
-</html>
+  <div class="hero-badge"><span>RUDR</span><small>PROPERTY PARTNER</small></div>
+</section>
+<section class="search-wrap" aria-label="Search properties">
+  <form class="search-panel reveal" id="searchForm">
+    <label class="search-field"><span>LOCATION</span><input id="locationSearch" placeholder="Try Gomti Nagar, Lucknow"></label>
+    <label class="search-field"><span>PROPERTY TYPE</span><select id="typeSearch"><option value="">All property types</option><option value="Residential">Residential</option><option value="Plot">Plot & Land</option><option value="Commercial">Commercial</option></select></label>
+    <button class="gold-button search-button" type="submit">Search ↗</button>
+  </form>
+</section>
+<section class="section properties-section" id="properties">
+  <div class="section-heading reveal"><div><p class="eyebrow">A CURATED COLLECTION</p><h2>Featured <em>properties</em></h2><p class="muted">Find the right space for your next chapter.</p></div><div class="listing-count" id="listingCount">Loading listings…</div></div>
+  <div class="property-grid" id="propertyCards"><div class="loading-card"><span class="loader"></span><p>Finding properties for you…</p></div></div>
+  <p class="status-message" id="statusMessage" role="status"></p>
+</section>
+<section class="trust-strip"><div class="reveal"><strong>01</strong><span>Local expertise<small>Knowledge of Lucknow neighbourhoods</small></span></div><div class="reveal" style="transition-delay:120ms"><strong>02</strong><span>Clear communication<small>Information that helps you decide</small></span></div><div class="reveal" style="transition-delay:240ms"><strong>03</strong><span>Personal support<small>From enquiry to next steps</small></span></div></section>
+<section class="about-section" id="about"><div class="about-image reveal"><div class="image-label">A BETTER WAY TO FIND PROPERTY</div></div><div class="about-copy reveal" style="transition-delay:150ms"><p class="eyebrow">ABOUT RUDR PROPERTIES</p><h2>Good property decisions<br><em>start with trust.</em></h2><p>We help you explore residential homes, plots and commercial opportunities in Lucknow. Our approach is personal, straightforward and focused on your requirements.</p><p>Tell us what you are looking for. We’ll help you explore the available options.</p><a class="text-link" href="#contact">Speak with our team ↗</a></div></section>
+<section class="contact-section" id="contact"><div class="reveal"><p class="eyebrow">LET'S FIND YOUR PROPERTY</p><h2>Have a property in mind?</h2><p>Share your requirements and our team will get in touch.</p></div><div class="contact-actions reveal" style="transition-delay:150ms"><a class="gold-button" id="whatsappMain" href="#" target="_blank" rel="noopener">Chat on WhatsApp ↗</a><a class="outline-button" href="mailto:rudrpropertieslko@gmail.com">Email us</a></div></section>
+</main>
+<footer><a class="brand footer-brand" href="#home"><span class="brand-mark">R</span><span><strong>RUDR <i>PROPERTIES</i></strong><small>YOUR PROPERTY PARTNER</small></span></a><p>Lucknow, Uttar Pradesh · <a href="mailto:rudrpropertieslko@gmail.com">rudrpropertieslko@gmail.com</a></p><p class="copyright">© <span id="year"></span> RUDR PROPERTIES. All rights reserved.</p></footer>
+<script src="app.js"></script>
+</body></html>
