@@ -24,6 +24,15 @@
   });
 
   let allProperties = [];
+    // Navbar mein Login link
+  const mainNav = document.getElementById('mainNav');
+  if (mainNav && !document.getElementById('loginLink')) {
+    const loginLink = document.createElement('a');
+    loginLink.id = 'loginLink';
+    loginLink.href = 'login.html';
+    loginLink.textContent = 'Login';
+    mainNav.insertBefore(loginLink, mainNav.querySelector('.nav-cta'));
+  }
     const topbar = document.querySelector('.topbar');
   addEventListener('scroll', () => topbar.classList.toggle('scrolled', scrollY > 40), { passive: true });
     const io = new IntersectionObserver(entries => {
