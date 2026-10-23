@@ -131,7 +131,6 @@ loginLink.textContent = 'Customer Login';
       const details = [property.area, property.description].filter(Boolean).join(' · ');
       const email = cfg.CONTACT_EMAIL || 'rudrpropertieslko@gmail.com';
       const emailSubject = `Property enquiry: ${property.title || 'Property'}`;
-      const isDemo = String(property.id || '').startsWith('demo-');
       const viewDetailsButton =
   `<a class="view-details-button" href="property-details.html?id=${encodeURIComponent(String(property.id))}">View Details</a>`;
 
