@@ -56,8 +56,8 @@
   if (mainNav && !$('loginLink')) {
     const loginLink = document.createElement('a');
     loginLink.id = 'loginLink';
-    loginLink.href = 'login.html';
-    loginLink.textContent = 'Login';
+loginLink.href = 'customer-login.html';
+loginLink.textContent = 'Customer Login';
     mainNav.insertBefore(loginLink, mainNav.querySelector('.nav-cta'));
   }
 
