@@ -52,13 +52,16 @@
   const topbar = document.querySelector('.topbar');
   if (topbar) addEventListener('scroll', () => topbar.classList.toggle('scrolled', scrollY > 40), { passive: true });
 
-  /* ---------- Login link in navbar ---------- */
-  if (mainNav && !$('loginLink')) {
-    const loginLink = document.createElement('a');
+  /* ---------- Customer Login link ---------- */
+  if (mainNav) {
+    let loginLink = mainNav.querySelector('a[href*="customer-login"]') || $('loginLink');
+    if (!loginLink) {
+      loginLink = document.createElement('a');
+      loginLink.href = 'customer-login.html';
+      loginLink.textContent = 'Customer Login';
+      mainNav.insertBefore(loginLink, mainNav.querySelector('.nav-cta'));
+    }
     loginLink.id = 'loginLink';
-loginLink.href = 'customer-login.html';
-loginLink.textContent = 'Customer Login';
-    mainNav.insertBefore(loginLink, mainNav.querySelector('.nav-cta'));
   }
 
   /* ---------- Listings ---------- */
@@ -131,8 +134,9 @@ loginLink.textContent = 'Customer Login';
       const details = [property.area, property.description].filter(Boolean).join(' · ');
       const email = cfg.CONTACT_EMAIL || 'rudrpropertieslko@gmail.com';
       const emailSubject = `Property enquiry: ${property.title || 'Property'}`;
-      const viewDetailsButton =
-  `<a class="view-details-button" href="property-details.html?id=${encodeURIComponent(String(property.id))}">View Details</a>`;
+      const isDemo = String(property.id || '').startsWith('demo-');
+      const viewDetailsButton = isDemo ? '' :
+        `<a class="view-details-button" href="property-details.html?id=${encodeURIComponent(String(property.id))}">View Details</a>`;
 
       return `
         <article class="property-card reveal" style="transition-delay:${Math.min(i, 5) * 90}ms">
@@ -199,28 +203,22 @@ loginLink.textContent = 'Customer Login';
     }
 
     try {
-      const client = window.supabase.createClient(
-  cfg.SUPABASE_URL,
-  cfg.SUPABASE_PUBLISHABLE_KEY,
-  {
-    auth: {
-      storageKey: 'rudr_public_auth',
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
-  }
-);
+      const client = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
 
-      ```javascript
-// Keep the public website login independent of the admin session
-const link = $('loginLink');
-if (link) {
-  link.textContent = 'Customer Login';
-  link.href = 'customer-login.html';
-}
-```
-      
+      // Signed-in customer: link becomes "Customer Logout"
+      client.auth.getSession().then(({ data }) => {
+        const link = $('loginLink');
+        if (data && data.session && link) {
+          link.textContent = 'Customer Logout';
+          link.href = '#';
+          link.dataset.signedIn = '1';
+          link.addEventListener('click', async e => {
+            e.preventDefault();
+            await client.auth.signOut();
+            location.reload();
+          });
+        }
+      }).catch(() => {});
 
       const { data, error } = await client.from('properties').select('*').order('created_at', { ascending: false });
       if (error) throw error;
@@ -241,10 +239,9 @@ if (link) {
   init();
 })();
 
-/* ===== Login overlay: main page behind, login on top ===== */
+/* ===== Customer login overlay: main page behind, login on top ===== */
 (() => {
   let box = null;
-
   const st = document.createElement('style');
   st.textContent = `
     #loginOverlay{position:fixed;inset:0;z-index:9999;background:rgba(6,7,6,.72);
@@ -261,13 +258,12 @@ if (link) {
     if (box) return;
     box = document.createElement('div');
     box.id = 'loginOverlay';
-    box.innerHTML = '<button class="lo-close" aria-label="Close">×</button><iframe src="login.html?v=3" title="Login"></iframe>';
+    box.innerHTML = '<button class="lo-close" aria-label="Close">×</button><iframe src="customer-login.html?v=1" title="Customer Login"></iframe>';
     box.querySelector('.lo-close').addEventListener('click', closeLogin);
     document.body.appendChild(box);
     document.body.style.overflow = 'hidden';
     requestAnimationFrame(() => box.classList.add('show'));
   }
-
   function closeLogin() {
     if (!box) return;
     const b = box; box = null;
@@ -275,16 +271,14 @@ if (link) {
     document.body.style.overflow = '';
     setTimeout(() => b.remove(), 350);
   }
-
   document.addEventListener('click', e => {
-    const a = e.target.closest('#loginLink');
-    if (!a || a.textContent.trim() !== 'Login') return;
+    const l = e.target.closest('#loginLink');
+    if (!l || l.dataset.signedIn) return;
     e.preventDefault();
     const nav = document.getElementById('mainNav');
     if (nav) nav.classList.remove('open');
     openLogin();
   });
-
   addEventListener('keydown', e => { if (e.key === 'Escape') closeLogin(); });
   addEventListener('message', e => {
     if (e.origin === location.origin && e.data === 'rudr-close') closeLogin();
