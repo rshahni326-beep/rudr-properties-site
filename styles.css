@@ -469,3 +469,20 @@
   .reveal{opacity:1;transform:none;transition:none}
   .hero-content > *,.hero-badge{animation:none}
 }
+/* Fix: Show View Details button */
+.card-actions .view-details-button {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 2;
+  color: #111;
+  background: #d4af37;
+  border: 1px solid #b8941f;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
