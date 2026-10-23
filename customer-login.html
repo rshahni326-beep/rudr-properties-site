@@ -1,0 +1,255 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Login | RUDR PROPERTIES</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #090909;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 30px 24px;
+      border: 1px solid #b89543;
+      border-radius: 18px;
+      background: #151515;
+      box-shadow: 0 0 30px #b8954320;
+    }
+
+    h1 {
+      color: #e6c36b;
+      text-align: center;
+      font-size: 27px;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #ccc;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 7px;
+      color: #e6c36b;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border-radius: 8px;
+      border: 1px solid #555;
+      background: #222;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 16px;
+      border: 0;
+      border-radius: 8px;
+      background: #d8b45a;
+      color: #111;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .secondary {
+      background: transparent;
+      border: 1px solid #d8b45a;
+      color: #e6c36b;
+    }
+
+    #message {
+      margin-top: 18px;
+      text-align: center;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    a { color: #e6c36b; }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 22px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <h1>RUDR PROPERTIES</h1>
+    <p class="subtitle">Customer Account</p>
+
+    <form id="loginForm">
+      <label for="email">Email Address</label>
+      <input id="email" type="email" autocomplete="email"
+             placeholder="Enter your email" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password"
+             autocomplete="current-password"
+             placeholder="Enter your password" required minlength="6">
+
+      <button type="submit" id="loginBtn">Customer Login</button>
+    </form>
+
+    <button type="button" class="secondary" id="signupBtn">
+      Create New Account
+    </button>
+
+    <button type="button" class="secondary" id="resetBtn">
+      Forgot Password?
+    </button>
+
+    <p id="message" role="status" aria-live="polite"></p>
+
+    <a class="back" href="./index.html">← Back to Home Page</a>
+  </main>
+
+  <script src="./config.js"></script>
+
+  <script>
+    const message = document.getElementById('message');
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const cfg = window.RUDR_CONFIG;
+
+    if (!cfg || !cfg.SUPABASE_URL || !cfg.SUPABASE_PUBLISHABLE_KEY) {
+      message.textContent =
+        'Setup error: Supabase configuration was not found.';
+      loginBtn.disabled = true;
+      signupBtn.disabled = true;
+      resetBtn.disabled = true;
+    } else {
+      const client = window.supabase.createClient(
+        cfg.SUPABASE_URL,
+        cfg.SUPABASE_PUBLISHABLE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            storageKey: 'rudr_customer_auth'
+          }
+        }
+      );
+
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+
+      function showMessage(text) {
+        message.textContent = text;
+      }
+
+      loginBtn.addEventListener('click', function () {
+        passwordInput.autocomplete = 'current-password';
+      });
+
+      document.getElementById('loginForm').addEventListener(
+        'submit', async function (event) {
+          event.preventDefault();
+          loginBtn.disabled = true;
+          showMessage('Logging in...');
+
+          try {
+            const { error } = await client.auth.signInWithPassword({
+              email: emailInput.value.trim(),
+              password: passwordInput.value
+            });
+
+            if (error) throw error;
+
+            showMessage('Login successful! Welcome to RUDR PROPERTIES.');
+          } catch (error) {
+            showMessage('Login failed: ' + error.message);
+          } finally {
+            loginBtn.disabled = false;
+          }
+        }
+      );
+
+      signupBtn.addEventListener('click', async function () {
+        signupBtn.disabled = true;
+        showMessage('Creating your account...');
+
+        try {
+          const { data, error } = await client.auth.signUp({
+            email: emailInput.value.trim(),
+            password: passwordInput.value,
+            options: {
+              emailRedirectTo: window.location.origin +
+                window.location.pathname
+            }
+          });
+
+          if (error) throw error;
+
+          showMessage(
+            data.session
+              ? 'Account created successfully. You can now log in.'
+              : 'Account request received. Check your email to confirm your account before logging in.'
+          );
+        } catch (error) {
+          showMessage('Registration failed: ' + error.message);
+        } finally {
+          signupBtn.disabled = false;
+        }
+      });
+
+      resetBtn.addEventListener('click', async function () {
+        const email = emailInput.value.trim();
+
+        if (!email) {
+          showMessage('Enter your email address first.');
+          emailInput.focus();
+          return;
+        }
+
+        resetBtn.disabled = true;
+        showMessage('Sending password reset email...');
+
+        try {
+          const { error } = await client.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin +
+              window.location.pathname
+          });
+
+          if (error) throw error;
+
+          showMessage('If the account exists, a password reset email has been requested. Check your inbox.');
+        } catch (error) {
+          showMessage('Could not request password reset: ' + error.message);
+        } finally {
+          resetBtn.disabled = false;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+```
