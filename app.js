@@ -202,19 +202,15 @@
     try {
       const client = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
 
-      // Login -> Logout when signed in
-      client.auth.getSession().then(({ data }) => {
-        const link = $('loginLink');
-        if (data && data.session && link) {
-          link.textContent = 'Logout';
-          link.href = '#';
-          link.addEventListener('click', async e => {
-            e.preventDefault();
-            await client.auth.signOut();
-            location.reload();
-          });
-        }
-      }).catch(() => {});
+      ```javascript
+// Keep the public website login independent of the admin session
+const link = $('loginLink');
+if (link) {
+  link.textContent = 'Customer Login';
+  link.href = 'customer-login.html';
+}
+```
+      
 
       const { data, error } = await client.from('properties').select('*').order('created_at', { ascending: false });
       if (error) throw error;
