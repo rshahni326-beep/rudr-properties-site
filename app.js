@@ -200,7 +200,18 @@ loginLink.textContent = 'Customer Login';
     }
 
     try {
-      const client = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
+      const client = window.supabase.createClient(
+  cfg.SUPABASE_URL,
+  cfg.SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth: {
+      storageKey: 'rudr_public_auth',
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  }
+);
 
       ```javascript
 // Keep the public website login independent of the admin session
