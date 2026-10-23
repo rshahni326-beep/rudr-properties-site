@@ -21,7 +21,6 @@
   <input id="imageFiles" type="file" accept="image/jpeg,image/png,image/webp" multiple>
   <span class="hint">Select multiple photos from your phone. Maximum 5 MB per photo.</span>
 </label>
-
 <label class="form-field full">Image URL (optional)
   <input id="imageUrl" type="url" placeholder="https://…">
   <span class="hint">You can also paste a direct HTTPS image URL.</span>
@@ -29,9 +28,8 @@
 <label class="form-field full">
   Upload Property Video
   <input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime">
-  <span class="hint">Choose a video from your phone. Maximum 100 MB.</span>
+  <span class="hint">Choose a video from your phone. Maximum 50 MB.</span>
 </label>
-
 <label class="form-field full">
   Video URL (optional)
   <input id="videoUrl" type="url" placeholder="https://…">
@@ -42,10 +40,12 @@
 <script>
 (() => {
 const cfg=window.RUDR_CONFIG||{}, $=id=>document.getElementById(id);
+const MAX_VIDEO_MB=50, MAX_PHOTO_MB=5, VIDEO_TIMEOUT_MS=120000;
 let client=null, user=null;
 const configured=cfg.SUPABASE_URL&&cfg.SUPABASE_PUBLISHABLE_KEY&&!cfg.SUPABASE_URL.includes('PASTE_')&&!cfg.SUPABASE_PUBLISHABLE_KEY.includes('PASTE_');
 if(!configured){$('configWarning').classList.remove('hidden');$('loginPanel').classList.add('hidden');return;}
-client=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_PUBLISHABLE_KEY);
+/* Admin has its own storage key, so it never shares a login with the public website */
+client=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_PUBLISHABLE_KEY,{auth:{storageKey:'rudr-admin-auth'}});
 function say(id,msg){$(id).textContent=msg;}
 function showDashboard(){ $('loginPanel').classList.add('hidden');$('dashboard').classList.remove('hidden');$('signOut').classList.remove('hidden');loadListings(); }
 function checkAdmin(u){return !!u&&String(u.email||'').toLowerCase()===String(cfg.ADMIN_EMAIL||'').toLowerCase();}
@@ -54,23 +54,8 @@ $('signIn').addEventListener('click',async()=>{say('loginStatus','Signing in…'
 $('signOut').addEventListener('click',async()=>{await client.auth.signOut();user=null;$('dashboard').classList.add('hidden');$('loginPanel').classList.remove('hidden');$('signOut').classList.add('hidden');say('loginStatus','Signed out.');});
 function clearForm(){$('propertyForm').reset();$('propertyId').value='';$('formTitle').textContent='Add a property';$('status').value='available';say('formStatus','');}
 $('clearForm').addEventListener('click',clearForm);
+
 $('propertyForm').addEventListener('submit', async e => {
-    const selectedVideo = $('videoFile').files[0];
-  let videoUrl = $('videoUrl').value.trim();
-    const oldVideoUrl = videoUrl;
-
-  if (selectedVideo) {
-    videoUrl = videoUrl || oldVideoUrl;
-    if (!['video/mp4', 'video/webm', 'video/quicktime'].includes(selectedVideo.type)) {
-      say('formStatus', 'Please choose MP4, WEBM, or MOV video.');
-      return;
-    }
-
-    if (selectedVideo.size > 100 * 1024 * 1024) {
-      say('formStatus', 'Video must be 100 MB or smaller.');
-      return;
-    }
-  }
   e.preventDefault();
 
   if (!checkAdmin(user)) {
@@ -79,73 +64,68 @@ $('propertyForm').addEventListener('submit', async e => {
   }
 
   const files = Array.from($('imageFiles').files || []);
-  const urls = [];
-  const selectedFiles = $('imageFiles').files;
+  const selectedVideo = $('videoFile').files[0];
+  let videoUrl = $('videoUrl').value.trim();
+  const typedImageUrl = $('imageUrl').value.trim();
 
-if (selectedFiles.length === 0 && !$('imageUrl').value.trim() && !selectedVideo && !videoUrl) {
-  say('formStatus', 'Please select at least one photo.');
-  return;
-}
-  const existing = $('propertyId').value
-    ? String($('imageUrl').value || '').trim()
-    : '';
-
-  if (existing) urls.push(existing);
+  if (!files.length && !typedImageUrl && !selectedVideo && !videoUrl) {
+    say('formStatus', 'Please select at least one photo.');
+    return;
+  }
 
   for (const file of files) {
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
       say('formStatus', 'Please select JPG, PNG, or WEBP images only.');
       return;
     }
-
-    if (file.size > 5 * 1024 * 1024) {
-      say('formStatus', 'Each photo must be 5 MB or smaller.');
+    if (file.size > MAX_PHOTO_MB * 1024 * 1024) {
+      say('formStatus', `Each photo must be ${MAX_PHOTO_MB} MB or smaller.`);
       return;
     }
   }
-        try {
-      if (selectedVideo) {
-        const safeVideoName = selectedVideo.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const videoPath = `${user.id}/${Date.now()}-${crypto.randomUUID()}-${safeVideoName}`;
 
-        say('formStatus', 'Uploading video…');
-
-        const uploadPromise = client.storage
-  .from('property-videos')
-  .upload(videoPath, selectedVideo, {
-    contentType: selectedVideo.type,
-    upsert: false
-  });
-
-const timeoutPromise = new Promise((_, reject) => {
-  setTimeout(() => reject(new Error(
-    'Upload timed out. Check internet, Supabase Storage settings, and permissions.'
-  )), 30000);
-});
-
-const { error: videoUploadError } = await Promise.race([
-  uploadPromise,
-  timeoutPromise
-]);
-
-if (videoUploadError) throw videoUploadError;
-
-        if (videoUploadError) throw videoUploadError;
-
-        const { data: videoPublicData } = client.storage
-          .from('property-videos')
-          .getPublicUrl(videoPath);
-
-        videoUrl = videoPublicData.publicUrl;
-      }
-    } catch (error) {
-      say('formStatus', 'Video upload error: ' + error.message);
+  if (selectedVideo) {
+    if (!['video/mp4', 'video/webm', 'video/quicktime'].includes(selectedVideo.type)) {
+      say('formStatus', 'Please choose MP4, WEBM, or MOV video.');
       return;
-        }
-    say('formStatus', 'Uploading photos and saving property…');
+    }
+    if (selectedVideo.size > MAX_VIDEO_MB * 1024 * 1024) {
+      say('formStatus', `Video must be ${MAX_VIDEO_MB} MB or smaller.`);
+      return;
+    }
+  }
+
   $('saveProperty').disabled = true;
 
   try {
+    if (selectedVideo) {
+      const safeVideoName = selectedVideo.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const videoPath = `${user.id}/${Date.now()}-${crypto.randomUUID()}-${safeVideoName}`;
+
+      say('formStatus', 'Uploading video…');
+
+      const uploadPromise = client.storage
+        .from('property-videos')
+        .upload(videoPath, selectedVideo, { contentType: selectedVideo.type, upsert: false });
+
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error(
+          'Upload timed out. Check internet, Supabase Storage settings, and permissions.'
+        )), VIDEO_TIMEOUT_MS);
+      });
+
+      const { error: videoUploadError } = await Promise.race([uploadPromise, timeoutPromise]);
+      if (videoUploadError) throw new Error('Video upload error: ' + videoUploadError.message);
+
+      const { data: videoPublicData } = client.storage.from('property-videos').getPublicUrl(videoPath);
+      videoUrl = videoPublicData.publicUrl;
+    }
+
+    say('formStatus', 'Uploading photos and saving property…');
+
+    const urls = [];
+    if (typedImageUrl) urls.push(typedImageUrl);
+
     for (const file of files) {
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
       const path = `${user.id}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
@@ -156,10 +136,7 @@ if (videoUploadError) throw videoUploadError;
 
       if (uploadError) throw uploadError;
 
-      const { data: publicData } = client.storage
-        .from('property-images')
-        .getPublicUrl(path);
-
+      const { data: publicData } = client.storage.from('property-images').getPublicUrl(path);
       urls.push(publicData.publicUrl);
     }
 
@@ -192,6 +169,7 @@ if (videoUploadError) throw videoUploadError;
     $('saveProperty').disabled = false;
   }
 });
+
 async function loadListings(){say('listStatus','Loading listings…');const {data,error}=await client.from('properties').select('*').order('created_at',{ascending:false});if(error){$('adminListings').textContent='Could not load listings: '+error.message;say('listStatus','Check your RLS policies and table permissions.');return;}
 if(!data||!data.length){$('adminListings').textContent='No listings yet. Add your first property above.';say('listStatus','');return;}
 $('adminListings').innerHTML=data.map(p=>`<div class="admin-row"><div><strong>${escapeHtml(p.title||'Untitled property')}</strong><small>${escapeHtml(p.location||'Location not set')} · ${escapeHtml(p.property_type||'Property')} · ${escapeHtml(p.status||'')}</small></div><div class="admin-actions" style="margin:0"><button class="admin-button" data-edit="${escapeHtml(p.id)}">Edit</button><button class="admin-button danger" data-delete="${escapeHtml(p.id)}">Delete</button></div></div>`).join('');
@@ -225,7 +203,7 @@ $('adminListings').querySelectorAll('[data-delete]').forEach(b => {
 });
 say('listStatus', '');
 }
-  
+
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 refreshSession();
 })();
