@@ -132,8 +132,8 @@ loginLink.textContent = 'Customer Login';
       const email = cfg.CONTACT_EMAIL || 'rudrpropertieslko@gmail.com';
       const emailSubject = `Property enquiry: ${property.title || 'Property'}`;
       const isDemo = String(property.id || '').startsWith('demo-');
-      const viewDetailsButton = isDemo ? '' :
-        `<a class="view-details-button" href="property-details.html?id=${encodeURIComponent(String(property.id))}">View Details</a>`;
+      const viewDetailsButton =
+  `<a class="view-details-button" href="property-details.html?id=${encodeURIComponent(String(property.id))}">View Details</a>`;
 
       return `
         <article class="property-card reveal" style="transition-delay:${Math.min(i, 5) * 90}ms">
