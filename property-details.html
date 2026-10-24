@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#10110f">
+<meta name="theme-color" content="#0a1b33">
 <title>Property Details | RUDR PROPERTIES</title>
 <meta name="description" id="metaDesc" content="Property details from RUDR PROPERTIES, Lucknow.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--ink:#10110f;--ink2:#4a4a44;--muted:#8a877d;--paper:#f5f3ee;--line:#e8e2d6;--gold:#c9a24b;--gold2:#d2b16b;--green:#1a9a55;--red:#d33a2c}
-body{font-family:"DM Sans",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+:root{--ink:#0a1b33;--ink2:#4a4a44;--muted:#8a877d;--paper:#f4f7fb;--line:#dde4ee;--gold:#c9a24b;--gold2:#d2b16b;--green:#1a9a55;--red:#d33a2c}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
-.topbar{position:sticky;top:0;z-index:30;background:rgba(16,17,15,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(214,173,96,.2)}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(10,27,51,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(214,173,96,.2)}
 .topbar .in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .brand{display:flex;align-items:center;gap:11px;color:#fff}
 .brand img{width:42px;height:42px;object-fit:contain}
@@ -38,7 +38,7 @@ main{max-width:1180px;margin:0 auto;padding:26px 20px 70px}
 .thumbs{display:flex;gap:10px;margin-top:12px;overflow-x:auto;padding-bottom:4px}
 .thumbs button{flex:none;width:92px;height:68px;border:2px solid transparent;padding:0;background:#ddd;cursor:pointer;opacity:.7;border-radius:4px;overflow:hidden;transition:.25s}
 .thumbs button.on{border-color:var(--gold);opacity:1}.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
-.thumbs button.vth{position:relative;background:#111}.thumbs video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}.play{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:18px;background:rgba(0,0,0,.28)}.main.isvid{cursor:default}.main.isvid .count{bottom:64px}.main.isvid .arrow{top:42%}.main video{width:100%;height:100%;object-fit:contain;background:#000;display:block}#stage{width:100%;height:100%}.section-title,.video h3{font:600 21px "Playfair Display",serif;margin-bottom:12px}
+.thumbs button.vth{position:relative;background:#111}.thumbs video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}.play{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:18px;background:rgba(0,0,0,.28)}.main.isvid{cursor:default}.main.isvid .count{bottom:64px}.main.isvid .arrow{top:42%}.main video{width:100%;height:100%;object-fit:contain;background:#000;display:block}#stage{width:100%;height:100%}.section-title,.video h3{font:600 21px "Sora",system-ui,sans-serif;margin-bottom:12px}
 .video video{width:100%;max-height:420px;background:#000;border-radius:6px}
 .card{background:#fff;border:1px solid var(--line);padding:26px;border-radius:6px}
 .sticky{position:sticky;top:84px}
@@ -46,14 +46,14 @@ main{max-width:1180px;margin:0 auto;padding:26px 20px 70px}
 .badge{font-size:11px;font-weight:700;letter-spacing:.12em;padding:5px 11px;color:#fff;background:var(--green);text-transform:uppercase}
 .badge.sold{background:var(--red)}.badge.rent{background:#b9822a}.badge.pending{background:#5a6b84}
 .badge.type{background:var(--ink);color:var(--gold2)}
-h1{font:600 33px/1.15 "Playfair Display",serif}
-.price{font:700 30px "DM Sans",sans-serif;color:#8d6a1f;margin:12px 0 6px}
+h1{font:600 33px/1.15 "Sora",system-ui,sans-serif}
+.price{font:700 30px "Inter",sans-serif;color:#8d6a1f;margin:12px 0 6px}
 .addr{display:flex;align-items:center;gap:14px;margin:16px 0 4px;padding:14px 16px;background:linear-gradient(135deg,#fcf6e6,#f5ebd1);border:1px solid #e6d3a0;border-left:4px solid var(--gold);border-radius:6px}
 .addr .pin{flex:none;width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--gold2);display:grid;place-items:center;box-shadow:0 6px 14px rgba(0,0,0,.2)}
 .addr .pin svg{width:22px;height:22px}
 .addr .txt{min-width:0;flex:1}
 .addr small{display:block;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#8d6a1f;font-weight:700}
-.addr strong{display:block;margin-top:2px;font:600 22px/1.25 "Playfair Display",serif;overflow-wrap:break-word}
+.addr strong{display:block;margin-top:2px;font:600 22px/1.25 "Sora",system-ui,sans-serif;overflow-wrap:break-word}
 
 .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0}
 .fact{background:var(--paper);padding:13px 14px;border-radius:4px}
@@ -72,13 +72,13 @@ h1{font:600 33px/1.15 "Playfair Display",serif}
 .mini{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden;transition:transform .3s,box-shadow .3s;display:block}
 .mini:hover{transform:translateY(-6px);box-shadow:0 16px 34px rgba(0,0,0,.14)}
 .mini img{width:100%;height:170px;object-fit:cover;display:block;background:#ddd}
-.mini div{padding:15px}.mini h4{font:600 19px "Playfair Display",serif;margin-bottom:4px}
+.mini div{padding:15px}.mini h4{font:600 19px "Sora",system-ui,sans-serif;margin-bottom:4px}
 .mini p{font-size:13px;color:var(--muted)}.mini b{display:block;margin-top:6px;color:#8d6a1f}
 .state{background:#fff;border:1px solid var(--line);padding:46px 24px;text-align:center;border-radius:6px}
-.state h2{font:600 26px "Playfair Display",serif;margin-bottom:10px}.state p{color:var(--ink2);margin-bottom:18px}
+.state h2{font:600 26px "Sora",system-ui,sans-serif;margin-bottom:10px}.state p{color:var(--ink2);margin-bottom:18px}
 .skel{background:linear-gradient(100deg,#e6e1d4 30%,#f1ede2 50%,#e6e1d4 70%);background-size:220% 100%;animation:sk 1.4s infinite;border-radius:6px}
 @keyframes sk{to{background-position:-120% 0}}
-footer{background:#0a0a09;color:rgba(255,255,255,.6);text-align:center;padding:26px 20px;font-size:13px}
+footer{background:#050f20;color:rgba(255,255,255,.6);text-align:center;padding:26px 20px;font-size:13px}
 footer a{color:var(--gold2)}
 .mbar{display:none}
 .toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;opacity:0;transition:.3s;z-index:60;pointer-events:none}
