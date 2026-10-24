@@ -38,7 +38,7 @@ main{max-width:1180px;margin:0 auto;padding:26px 20px 70px}
 .thumbs{display:flex;gap:10px;margin-top:12px;overflow-x:auto;padding-bottom:4px}
 .thumbs button{flex:none;width:92px;height:68px;border:2px solid transparent;padding:0;background:#ddd;cursor:pointer;opacity:.7;border-radius:4px;overflow:hidden;transition:.25s}
 .thumbs button.on{border-color:var(--gold);opacity:1}.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
-.video{margin-top:22px}.video h3,.section-title{font:600 21px "Playfair Display",serif;margin-bottom:12px}
+.thumbs button.vth{position:relative;background:#111}.thumbs video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}.play{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:18px;background:rgba(0,0,0,.28)}.main.isvid{cursor:default}.main.isvid .count{bottom:64px}.main.isvid .arrow{top:42%}.main video{width:100%;height:100%;object-fit:contain;background:#000;display:block}#stage{width:100%;height:100%}.section-title,.video h3{font:600 21px "Playfair Display",serif;margin-bottom:12px}
 .video video{width:100%;max-height:420px;background:#000;border-radius:6px}
 .card{background:#fff;border:1px solid var(--line);padding:26px;border-radius:6px}
 .sticky{position:sticky;top:84px}
@@ -163,6 +163,8 @@ footer a{color:var(--gold2)}
 
   function render(p) {
     const photos = imgs(p), st = statusInfo(p.status), title = p.title || 'Property';
+    const items = photos.map(u => ({ t: 'img', u }));
+    if (p.video_url && /^https:\/\//i.test(String(p.video_url).trim())) items.push({ t: 'video', u: String(p.video_url).trim() });
     const price = p.price || 'Price on request', loc = p.location || 'Location on request';
     document.title = `${title} in ${loc} | RUDR PROPERTIES`;
     $('metaDesc').content = `${title} in ${loc}. ${price}. ${(p.description || '').slice(0, 110)}`;
@@ -180,12 +182,13 @@ footer a{color:var(--gold2)}
       <div class="layout">
         <section class="gallery rv">
           <div class="main" id="mainBox">
-            ${photos.length ? `<img id="mainImg" src="${esc(photos[0])}" alt="${esc(title)}">` : `<div style="height:100%;display:grid;place-items:center;color:#8a877d">No photo available</div>`}
-            ${photos.length > 1 ? `<button class="arrow prev" id="gp" aria-label="Previous photo">‹</button><button class="arrow next" id="gn" aria-label="Next photo">›</button><span class="count" id="cnt">1 / ${photos.length}</span>` : ''}
-            ${photos.length ? `<span class="zoom">⤢ View full size</span>` : ''}
+            ${items.length ? `<div id="stage"></div>` : `<div style="height:100%;display:grid;place-items:center;color:#8a877d">No photo available</div>`}
+            ${items.length > 1 ? `<button class="arrow prev" id="gp" aria-label="Previous">‹</button><button class="arrow next" id="gn" aria-label="Next">›</button><span class="count" id="cnt">1 / ${items.length}</span>` : ''}
+            ${photos.length ? `<span class="zoom" id="zoom">⤢ View full size</span>` : ''}
           </div>
-          ${photos.length > 1 ? `<div class="thumbs" id="thumbs">${photos.map((u, i) => `<button class="${i ? '' : 'on'}" data-i="${i}" aria-label="Photo ${i + 1}"><img src="${esc(u)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}
-          ${p.video_url ? `<div class="video"><h3>Property video</h3><video src="${esc(p.video_url)}" controls playsinline preload="metadata"></video></div>` : ''}
+          ${items.length > 1 ? `<div class="thumbs" id="thumbs">${items.map((m, k) => m.t === 'video'
+            ? `<button class="vth ${k ? '' : 'on'}" data-i="${k}" aria-label="Video"><video src="${esc(m.u)}#t=0.1" muted playsinline preload="metadata"></video><span class="play">▶</span></button>`
+            : `<button class="${k ? '' : 'on'}" data-i="${k}" aria-label="Photo ${k + 1}"><img src="${esc(m.u)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}
         </section>
 
         <aside class="sticky rv" style="animation-delay:.12s">
@@ -217,7 +220,7 @@ footer a{color:var(--gold2)}
       <section class="similar" id="similar" hidden><h2 class="section-title">You may also like</h2><div class="grid" id="simGrid"></div></section>
       <div class="mbar"><a class="btn wa" href="${wa}" target="_blank" rel="noopener">WhatsApp</a><a class="btn call" href="${tel}">Call us</a></div>`;
 
-    setupGallery(photos);
+    setupGallery(items, photos, title);
     $('share').addEventListener('click', async () => {
       try {
         if (navigator.share) await navigator.share({ title, text: `${title} · ${price} · ${loc}`, url: link });
@@ -226,37 +229,55 @@ footer a{color:var(--gold2)}
     });
   }
 
-  function setupGallery(photos) {
-    if (!photos.length) return;
-    let i = 0;
-    const img = $('mainImg'), cnt = $('cnt'), thumbs = $('thumbs'), lb = $('lb'), lbImg = $('lbImg');
-    function go(n) {
-      i = (n + photos.length) % photos.length;
-      img.src = photos[i]; lbImg.src = photos[i];
-      if (cnt) cnt.textContent = `${i + 1} / ${photos.length}`;
+  function setupGallery(items, photos, title) {
+    if (!items.length) return;
+    let i = 0, li = 0;
+    const stage = $('stage'), cnt = $('cnt'), thumbs = $('thumbs'), box = $('mainBox'), zoom = $('zoom');
+    const lb = $('lb'), lbImg = $('lbImg');
+
+    function show() {
+      const m = items[i];
+      box.classList.toggle('isvid', m.t === 'video');
+      stage.innerHTML = m.t === 'video'
+        ? `<video src="${esc(m.u)}" controls playsinline preload="metadata"></video>`
+        : `<img src="${esc(m.u)}" alt="${esc(title)}">`;
+      if (zoom) zoom.style.display = m.t === 'video' ? 'none' : '';
+      if (cnt) cnt.textContent = `${i + 1} / ${items.length}`;
       if (thumbs) thumbs.querySelectorAll('button').forEach((b, k) => b.classList.toggle('on', k === i));
     }
+    const go = n => { i = (n + items.length) % items.length; show(); };
+    const lbGo = n => { li = (n + photos.length) % photos.length; lbImg.src = photos[li]; };
+    show();
+
     if ($('gp')) { $('gp').onclick = e => { e.stopPropagation(); go(i - 1); }; $('gn').onclick = e => { e.stopPropagation(); go(i + 1); }; }
     if (thumbs) thumbs.onclick = e => { const b = e.target.closest('button'); if (b) go(+b.dataset.i); };
-    $('mainBox').onclick = () => { lbImg.src = photos[i]; lb.classList.add('open'); document.body.style.overflow = 'hidden'; };
-    const close = () => { lb.classList.remove('open'); document.body.style.overflow = ''; };
+
+    box.onclick = e => {
+      if (items[i].t !== 'img' || e.target.closest('.arrow')) return;
+      li = i; lbImg.src = photos[li]; lb.classList.add('open'); document.body.style.overflow = 'hidden';
+    };
+    const close = () => { lb.classList.remove('open'); document.body.style.overflow = ''; i = li; show(); };
     $('lbX').onclick = close;
     lb.onclick = e => { if (e.target === lb) close(); };
-    $('lbP').onclick = e => { e.stopPropagation(); go(i - 1); };
-    $('lbN').onclick = e => { e.stopPropagation(); go(i + 1); };
+    $('lbP').onclick = e => { e.stopPropagation(); lbGo(li - 1); };
+    $('lbN').onclick = e => { e.stopPropagation(); lbGo(li + 1); };
+    if (photos.length < 2) { $('lbP').style.display = 'none'; $('lbN').style.display = 'none'; }
     addEventListener('keydown', e => {
       if (!lb.classList.contains('open')) return;
-      if (e.key === 'Escape') close(); if (e.key === 'ArrowLeft') go(i - 1); if (e.key === 'ArrowRight') go(i + 1);
+      if (e.key === 'Escape') close(); if (e.key === 'ArrowLeft') lbGo(li - 1); if (e.key === 'ArrowRight') lbGo(li + 1);
     });
+
     let x0 = null;
-    [$('mainBox'), lb].forEach(el => {
-      el.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+    const swipe = (el, fn) => {
+      el.addEventListener('touchstart', e => { x0 = e.target.closest('video') ? null : e.touches[0].clientX; }, { passive: true });
       el.addEventListener('touchend', e => {
         if (x0 === null) return;
         const dx = e.changedTouches[0].clientX - x0; x0 = null;
-        if (Math.abs(dx) > 45) go(i + (dx < 0 ? 1 : -1));
+        if (Math.abs(dx) > 45) fn(dx < 0 ? 1 : -1);
       });
-    });
+    };
+    swipe(box, d => go(i + d));
+    swipe(lb, d => lbGo(li + d));
   }
 
   async function loadSimilar(client, p) {
