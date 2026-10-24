@@ -258,7 +258,7 @@
     if (box) return;
     box = document.createElement('div');
     box.id = 'loginOverlay';
-    box.innerHTML = '<button class="lo-close" aria-label="Close">×</button><iframe src="customer-login.html?v=1" title="Customer Login"></iframe>';
+    box.innerHTML = '<button class="lo-close" aria-label="Close">×</button><iframe src="customer-login.html?v=3" title="Customer Login"></iframe>';
     box.querySelector('.lo-close').addEventListener('click', closeLogin);
     document.body.appendChild(box);
     document.body.style.overflow = 'hidden';
