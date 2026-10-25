@@ -144,11 +144,6 @@
             <span class="status-badge ${esc(status)}">${esc(statusLabelFor(status))}</span>
             ${firstImage ? `<img src="${esc(firstImage)}" alt="${esc(property.title || 'Property')}" loading="lazy"
                   style="width:100%;height:220px;object-fit:cover;border-radius:8px;">` : ''}
-            ${property.video_url ? `<div style="margin-top:12px;">
-                  <video src="${esc(property.video_url)}" controls playsinline preload="metadata"
-                    style="width:100%;max-height:320px;border-radius:10px;background:#000;">
-                    Your browser does not support video playback.
-                  </video></div>` : ''}
             <span class="property-type">${esc(propertyType)}</span>
           </div>
           <div class="property-body">
